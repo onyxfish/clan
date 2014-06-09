@@ -4,7 +4,7 @@ import sys
 from setuptools import setup
 
 install_requires = [
-    'google-api-python-client==1.2'
+    'google-api-python-client==1.2',
     'httplib2==0.9'
 ]
 
@@ -21,7 +21,7 @@ setup(
     url='https://github.com/onyxfish/clan',
     license='MIT',
     classifiers=[
-        'Development Status :: 5 - Alpha',
+        'Development Status :: 2 - Pre-Alpha',
         'Environment :: Console',
         'Intended Audience :: Developers',
         'Intended Audience :: End Users/Desktop',
