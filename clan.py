@@ -18,10 +18,6 @@ import yaml
 CLIENT_SECRETS = os.path.expanduser('~/.google_analytics_secrets.json')
 DAT = os.path.expanduser('~/.google_analytics_auth.dat')
 
-SERVICE_NAME = 'analytics'
-SERVICE_VERSION = 'v3'
-SCOPE = 'https://www.googleapis.com/auth/analytics.readonly'
-
 class Clan(object):
     """
     Command-line interface to Google Analytics.
@@ -95,7 +91,7 @@ class Clan(object):
             try:
                 flow = client.flow_from_clientsecrets(
                     CLIENT_SECRETS,
-                    scope=SCOPE
+                    scope='https://www.googleapis.com/auth/analytics.readonly'
                 )
             except InvalidClientSecretsError:
                 print 'Client secrets not found at %s' % CLIENT_SECRETS
@@ -104,7 +100,7 @@ class Clan(object):
             
         http = credentials.authorize(http=httplib2.Http())
     
-        return discovery.build(SERVICE_NAME, SERVICE_VERSION, http=http)
+        return discovery.build('analytics', 'v3', http=http)
 
     def query(self, start_date=None, end_date=None, metrics=[], dimensions=[], filters=None, sort=[], start_index=1, max_results=10):
         """
@@ -178,8 +174,8 @@ class Clan(object):
             data = {
                 'config': analytic,
                 'sampled': results.get('containsSampledData', False),
-                'sampleSize': results.get('sampleSize', None),
-                'sampleSpace': results.get('sampleSpace', None),
+                'sampleSize': int(results.get('sampleSize', 0)),
+                'sampleSpace': int(results.get('sampleSpace', 0)),
                 'data_types': OrderedDict(),
                 'data': OrderedDict()
             }
@@ -209,6 +205,7 @@ class Clan(object):
 
                 data['data'][metric]['total'] = cast_data_type(results['totalsForAllResults'][metric], data_type)
 
+                # Prevent rate-limiting
                 sleep(1)
 
             output['analytics'].append(data)
@@ -241,39 +238,20 @@ class Clan(object):
         """
         return '{:.1%}'.format(float(d) / t)
 
-    def _header(self, s):
-        """
-        Format a report header.
-        """
-        return '\n%s\n' % s
-
-    def _three_columns(self, a, b, c):
-        """
-        Format a three-column layout.
-        """
-        return '{:>15s}    {:>6s}    {:s}\n'.format(a, b, c)
-
-    def _top_one_metric(self, f, data, total):
-        """
-        Write summary data one metric.
-        """
-        for d, v in data.items():
-            if total:
-                pct = self._percent(v, total)
-            else:
-                pct = '-'
-
-            f.write(self._three_columns(self._comma(v), pct, d))
-
     def txt(self, report, f):
         """
         Write report data to a human-readable text file.
         """
         for analytic in report['analytics']:
-            f.write(self._header(analytic['config']['name']))
+            f.write('%s\n' % analytic['config']['name'])
+
+            if analytic['sampled']:
+                f.write('(using {:.1%} of data as sample)\n'.format(float(analytic['sampleSize']) / analytic['sampleSpace']))
+                
+            f.write('\n')
 
             for metric, data in analytic['data'].items():
-                f.write('\n    %s\n' % metric)
+                f.write('    %s\n' % metric)
 
                 data_type = analytic['data_types'][metric]
                 total = data['total']
@@ -286,7 +264,11 @@ class Clan(object):
                         pct = '-'
                         value = self._duration(value)
 
-                    f.write(self._three_columns(value, pct, label))
+                    f.write('{:>15s}    {:>6s}    {:s}\n'.format(value, pct, label))
+
+                f.write('\n')
+
+            f.write('\n')
 
     def main(self):
         if self.args.data_path:

@@ -23,9 +23,6 @@ analytics:
     - name: Totals by browser 
       metrics:
           - "ga:pageviews"
-          - "ga:uniquePageviews"
-          - "ga:users"
-          - "ga:sessions"
       dimensions:
           - "ga:browser"
       sort:
@@ -33,9 +30,6 @@ analytics:
     - name: Totals by source 
       metrics:
           - "ga:pageviews"
-          - "ga:uniquePageviews"
-          - "ga:users"
-          - "ga:sessions"
       dimensions:
           - "ga:source"
       sort:
@@ -43,9 +37,6 @@ analytics:
     - name: Totals by social network 
       metrics:
           - "ga:pageviews"
-          - "ga:uniquePageviews"
-          - "ga:users"
-          - "ga:sessions"
       dimensions:
           - "ga:socialNetwork"
       sort:
@@ -87,3 +78,11 @@ analytics:
       dimensions:
           - "ga:eventLabel"
       filters: "ga:eventAction==facebook"
+    - name: "Event: email"
+      metrics:
+          - "ga:totalEvents"
+          - "ga:uniqueEvents"
+      dimensions:
+          - "ga:eventLabel"
+      filters: "ga:eventAction==email"
+
