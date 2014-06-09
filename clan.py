@@ -16,9 +16,6 @@ from oauth2client.file import Storage
 from oauth2client import tools
 import yaml
 
-CLIENT_SECRETS = os.path.expanduser('~/.google_analytics_secrets.json')
-DAT = os.path.expanduser('~/.google_analytics_auth.dat')
-
 class Clan(object):
     """
     Command-line interface to Google Analytics.
@@ -30,6 +27,18 @@ class Clan(object):
         self.argparser = argparse.ArgumentParser(
             description='A command-line interface to Google Analytics',
             parents=[tools.argparser]
+        )
+
+        self.argparser.add_argument(
+            '--auth',
+            dest='auth', action='store', default=os.path.expanduser('~/.google_analytics_auth.dat'),
+            help='Path to the authorized credentials file (analytics.dat).'
+        )
+
+        self.argparser.add_argument(
+            '--secrets',
+            dest='secrets', action='store', default=os.path.expanduser('~/.google_analytics_secrets.json'),
+            help='Path to the authorization secrets file (client_secrets.json).'
         )
 
         self.argparser.add_argument(
@@ -84,17 +93,17 @@ class Clan(object):
         """
         Authorize with OAuth2.
         """
-        storage = Storage(DAT)
+        storage = Storage(self.args.auth)
         credentials = storage.get()
         
         if not credentials or credentials.invalid:
             try:
                 flow = client.flow_from_clientsecrets(
-                    CLIENT_SECRETS,
+                    self.args.secrets,
                     scope='https://www.googleapis.com/auth/analytics.readonly'
                 )
             except InvalidClientSecretsError:
-                print 'Client secrets not found at %s' % CLIENT_SECRETS
+                print 'Client secrets not found at %s' % self.args.secrets
             
             credentials = tools.run_flow(flow, storage, self.args)
             
@@ -154,10 +163,10 @@ class Clan(object):
         """
         output = {
             'property-id': self.config['property-id'],
-            'start-date': self.config['start-date'],
-            'end-date': self.config['end-date'],
-            'domain': self.config['domain'],
-            'prefix': self.config['prefix'],
+            'start-date': self.config.get('start-date', None),
+            'end-date': self.config.get('end-date', None),
+            'domain': self.config.get('domain', None),
+            'prefix': self.config.get('prefix', None),
             'analytics': [] 
         }
 
