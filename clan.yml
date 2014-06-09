@@ -13,6 +13,7 @@ analytics:
           - "ga:uniquePageviews"
           - "ga:users"
           - "ga:sessions"
+
     - name: Totals by device category
       metrics:
           - "ga:pageviews"
@@ -23,70 +24,23 @@ analytics:
           - "ga:deviceCategory"
       sort:
           - "-ga:pageviews"
-    - name: Totals by browser 
-      metrics:
-          - "ga:pageviews"
-      dimensions:
-          - "ga:browser"
-      sort:
-          - "-ga:pageviews"
-    - name: Totals by source 
-      metrics:
-          - "ga:pageviews"
-      dimensions:
-          - "ga:source"
-      sort:
-          - "-ga:pageviews"
-    - name: Totals by social network 
-      metrics:
-          - "ga:pageviews"
-      dimensions:
-          - "ga:socialNetwork"
-      sort:
-          - "-ga:pageviews"
-    - name: Top pages 
-      metrics:
-          - "ga:pageviews"
-      dimensions:
-          - "ga:pagePath"
-      sort:
-          - "-ga:pageviews"
-      max-results: 20
+
     - name: Performance
       metrics:
           - "ga:avgPageLoadTime"
           - "ga:avgPageDownloadTime"
           - "ga:avgDomInteractiveTime"
           - "ga:avgDomContentLoadedTime"
+
     - name: Time on site
       metrics:
           - "ga:avgSessionDuration"
-    - name: Time on site by device category
-      metrics:
-          - "ga:avgSessionDuration"
-      dimensions:
-          - "ga:deviceCategory"
-      sort:
-          - "-ga:avgSessionDuration"
+
     - name: "Event: tweet"
       metrics:
           - "ga:totalEvents"
           - "ga:uniqueEvents"
       dimensions:
           - "ga:eventLabel"
+          - "ga:customVarValue1"
       filters: "ga:eventAction==tweet"
-    - name: "Event: facebook"
-      metrics:
-          - "ga:totalEvents"
-          - "ga:uniqueEvents"
-      dimensions:
-          - "ga:eventLabel"
-      filters: "ga:eventAction==facebook"
-    - name: "Event: email"
-      metrics:
-          - "ga:totalEvents"
-          - "ga:uniqueEvents"
-      dimensions:
-          - "ga:eventLabel"
-      filters: "ga:eventAction==email"
-
