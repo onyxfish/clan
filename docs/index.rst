@@ -63,7 +63,7 @@ To configure clan, create a YAML data file describing the analytics you want to 
     start-date: "2014-06-01"
     end-date: "2014-06-04"
     domain: "apps.npr.org"
-    prefix: "/best-books-2013/"
+    prefix: "/commencement/"
 
     # Metrics to report
     analytics:
@@ -111,49 +111,50 @@ Here is sample output for the above configuration::
     Report run 2014-06-06 with:
         property-id: 53470309
         start-date: 2014-06-01
+        prefix: /commencement/
 
     Totals
+    (using 89.0% of data as sample)
 
         ga:pageviews
-         26,549,529    100.0%    total
+             88,935    100.0%    total
 
         ga:uniquePageviews
-         16,650,481    100.0%    total
+             60,179    100.0%    total
 
         ga:users
-          6,778,073    100.0%    total
+             21,244    100.0%    total
 
         ga:sessions
-         11,228,183    100.0%    total
+             26,817    100.0%    total
 
 
     Totals by device category
     (using 89.0% of data as sample)
 
         ga:pageviews
-         19,651,273     74.7%    desktop
-          4,850,906     18.4%    mobile
-          1,802,445      6.9%    tablet
-         26,304,624    100.0%    total
+             64,542     72.6%    desktop
+             15,403     17.3%    mobile
+              8,991     10.1%    tablet
+             88,936    100.0%    total
 
         ga:uniquePageviews
-         10,764,238     65.3%    desktop
-          4,237,022     25.7%    mobile
-          1,484,038      9.0%    tablet
-         16,485,298    100.0%    total
+             40,966     68.1%    desktop
+             12,277     20.4%    mobile
+              6,936     11.5%    tablet
+             60,179    100.0%    total
 
         ga:users
-          3,741,112     54.8%    desktop
-          2,357,376     34.5%    mobile
-            726,753     10.6%    tablet
-          6,825,241    100.0%    total
+             12,838     60.4%    desktop
+              6,084     28.6%    mobile
+              2,322     10.9%    tablet
+             21,244    100.0%    total
 
         ga:sessions
-          6,492,857     58.4%    desktop
-          3,548,599     31.9%    mobile
-          1,079,451      9.7%    tablet
-         11,120,907    100.0%    total
-
+             16,014     59.7%    desktop
+              7,644     28.5%    mobile
+              3,159     11.8%    tablet
+             26,817    100.0%    total
 
 Authors
 =======
