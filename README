@@ -1,5 +1,5 @@
-clan
-----
+clan: command line analytics
+----------------------------
 
 A command line utility for generating reports from Google Analytics.
 
