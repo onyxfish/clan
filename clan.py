@@ -6,6 +6,7 @@ import httplib2
 import json
 import os
 import sys 
+from time import sleep
 
 from apiclient import discovery
 from oauth2client import client
@@ -43,9 +44,27 @@ class Clan(object):
         )
 
         self.argparser.add_argument(
+            '-d', '--data',
+            dest='data_path', action='store', default=None,
+            help='Path to a existing data file.'
+        )
+
+        self.argparser.add_argument(
+            '-f', '--format',
+            dest='format', action='store', default='txt', choices=['txt', 'json'],
+            help='Output format.'
+        )
+
+        self.argparser.add_argument(
             '-v', '--verbose',
             dest='verbose', action='store_true',
             help='Print detailed tracebacks when errors occur.'
+        )
+
+        self.argparser.add_argument(
+            'output',
+            action='store',
+            help='Output file path.'
         )
 
         self.args = self.argparser.parse_args(args)
@@ -53,12 +72,6 @@ class Clan(object):
         self._install_exception_handler()
 
         self.service = self._authorize()
-
-        with open(self.args.config_path) as f:
-            self.config = yaml.load(f)
-
-        if 'property-id' not in self.config:
-            raise Exception('Property ID is required.')
 
     def _install_exception_handler(self):
         """
@@ -96,7 +109,7 @@ class Clan(object):
 
     def query(self, start_date=None, end_date=None, metrics=[], dimensions=[], filters=None, sort=[], start_index=1, max_results=10):
         """
-        Execute a query
+        Execute a query.
         """
         if start_date:
             start_date = start_date
@@ -140,8 +153,10 @@ class Clan(object):
             max_results=str(max_results)
         ).execute()
 
-
-    def main(self):
+    def report(self):
+        """
+        Query analytics and stash data in a format suitable for serializing.
+        """
         output = {
             'property-id': self.config['property-id'],
             'analytics': [] 
@@ -158,41 +173,140 @@ class Clan(object):
                 start_index=analytic.get('start-index', 1),
                 max_results=analytic.get('max-results', 10)
             )
+            
+            dimensions_len = len(analytic.get('dimensions', []))
 
             data = {
                 'config': analytic,
                 'sampled': results.get('containsSampledData', False),
                 'sampleSize': results.get('sampleSize', None),
-                'sampleSpace': results.geT('sampleSpace', None),
+                'sampleSpace': results.get('sampleSpace', None),
+                'data_types': OrderedDict(),
                 'data': OrderedDict()
             }
                     
-            dimensions_len = len(analytic.get('dimensions', []))
+            for column in results['columnHeaders'][dimensions_len:]:
+                data['data_types'][column['name']] = column['dataType']
+
+            def cast_data_type(d, dt):
+                if dt == 'INTEGER':
+                    return int(d)
+                elif data_type == 'TIME' or data_type == 'FLOAT':  
+                    return float(d)
+                else:
+                    raise Exception('Unknown metric data type: %s' % data_type)
 
             for i, metric in enumerate(analytic['metrics']):
                 data['data'][metric] = OrderedDict()
+                data_type = data['data_types'][metric]
 
                 if dimensions_len:
                     for row in results.get('rows', []):
                         column = i + dimensions_len
                         label = ','.join(row[:dimensions_len]) 
-                        data_type = results['columnHeaders'][column]['dataType']
-
-                        if data_type == 'INTEGER':
-                            value = int(row[column])
-                        elif data_type == 'TIME':  
-                            value = float(row[column])
-                        else:
-                            raise Exception('Unknown metric data type: %s' % data_type)
+                        value = cast_data_type(row[column], data_type)
 
                         data['data'][metric][label] = value 
 
-                data['data'][metric]['all'] = results['totalsForAllResults'][metric]
+                data['data'][metric]['total'] = cast_data_type(results['totalsForAllResults'][metric], data_type)
+
+                sleep(1)
 
             output['analytics'].append(data)
 
-        with open('analytics.json', 'w') as f:
-            json.dump(output, f, indent=4)
+        return output
+
+    def _duration(self, secs):
+        """
+        Format a duration in seconds as minutes and seconds.
+        """
+        secs = int(secs)
+
+        if secs > 60:
+            mins = secs / 60
+            secs = secs - (mins * 60)
+
+            return '%im %02is' % (mins, secs)
+
+        return '%is' % secs
+
+    def _comma(self, d):
+        """
+        Format a comma separated number.
+        """
+        return '{:,d}'.format(d)
+
+    def _percent(self, d, t):
+        """
+        Format a value as a percent of a total.
+        """
+        return '{:.1%}'.format(float(d) / t)
+
+    def _header(self, s):
+        """
+        Format a report header.
+        """
+        return '\n%s\n' % s
+
+    def _three_columns(self, a, b, c):
+        """
+        Format a three-column layout.
+        """
+        return '{:>15s}    {:>6s}    {:s}\n'.format(a, b, c)
+
+    def _top_one_metric(self, f, data, total):
+        """
+        Write summary data one metric.
+        """
+        for d, v in data.items():
+            if total:
+                pct = self._percent(v, total)
+            else:
+                pct = '-'
+
+            f.write(self._three_columns(self._comma(v), pct, d))
+
+    def txt(self, report, f):
+        """
+        Write report data to a human-readable text file.
+        """
+        for analytic in report['analytics']:
+            f.write(self._header(analytic['config']['name']))
+
+            for metric, data in analytic['data'].items():
+                f.write('\n    %s\n' % metric)
+
+                data_type = analytic['data_types'][metric]
+                total = data['total']
+
+                for label, value in data.items():
+                    if data_type == 'INTEGER':
+                        pct = self._percent(value, total) if total > 0 else '0.0%' 
+                        value = self._comma(value)
+                    elif data_type == 'TIME' or data_type == 'FLOAT':
+                        pct = '-'
+                        value = self._duration(value)
+
+                    f.write(self._three_columns(value, pct, label))
+
+    def main(self):
+        if self.args.data_path:
+            with open(self.args.data_path) as f:
+                data = json.load(f, object_pairs_hook=OrderedDict)
+        else:
+            with open(self.args.config_path) as f:
+                self.config = yaml.load(f)
+
+            if 'property-id' not in self.config:
+                raise Exception('Property ID is required.')
+
+            data = self.report()
+
+        with open(self.args.output, 'w') as f:
+            if self.args.format == 'txt':
+                self.txt(data, f)
+            elif self.args.format == 'json':
+                json.dump(data, f, indent=4)
 
 def _main():
     clan = Clan()

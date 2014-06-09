@@ -2,3 +2,11 @@ clan
 ----
 
 A command line utility for working with Google Analytics.
+
+Write JSON:
+
+    python clan.py -f json analytics.json
+
+Write txt:
+
+    python clan.py -f txt -d analytics.json analytics.txt
