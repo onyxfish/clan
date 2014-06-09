@@ -47,7 +47,7 @@ To configure clan, create a YAML data file describing the analytics you want to 
     start-date: "2014-06-01"
     end-date: "2014-06-04"
     domain: "apps.npr.org"
-    prefix: "/commencement/"
+    prefix: "/best-books-2013/"
 
     # Metrics to report
     analytics:
@@ -67,6 +67,10 @@ To configure clan, create a YAML data file describing the analytics you want to 
               - "ga:deviceCategory"
           sort:
               - "-ga:pageviews"
+
+.. note::
+
+    For details about all metrics you can report on, see the `Google Analytics Core Reporting API docs <https://developers.google.com/analytics/devguides/reporting/core/dimsmets>`_.
 
 To run this report to a JSON file:
 
