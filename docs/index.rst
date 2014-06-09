@@ -106,9 +106,7 @@ You can also convert an existing JSON report to text, like so:
 
     clan -f txt -d analytics.json analytics.txt
 
-Here is sample output for the above configuration:
-
-.. code-block::
+Here is sample output for the above configuration::
 
     Report run 2014-06-06 with:
         property-id: 53470309
