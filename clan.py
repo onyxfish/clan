@@ -42,7 +42,7 @@ class Clan(object):
 
         self.argparser.add_argument(
             '-c', '--config',
-            dest='config_path', action='store', default='clan.yaml',
+            dest='config_path', action='store', default='clan.yml',
             help='Path to a YAML configuration file.'
         )
 
