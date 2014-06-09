@@ -36,15 +36,15 @@ If you are a developer that also wants to hack on clan, install it this way::
 Authentication
 ==============
 
-Before you use clan, you're going to need to setup your access to the Google Analytics API. Follow the `instructions in Google's docs <https://developers.google.com/analytics/solutions/articles/hello-analytics-api#register_project>`_ to register an application and create the `client_secrets.json` file.
+Before you use clan, you're going to need to setup your access to the Google Analytics API. Follow the `instructions in Google's docs <https://developers.google.com/analytics/solutions/articles/hello-analytics-api#register_project>`_ to register an application and create the :code:`client_secrets.json` file.
 
-Once you've got a `client_secrets.json` file, simple run clan and it will acquire an oAuth token for you.
+Once you've got a :code:`client_secrets.json` file, simple run clan and it will acquire an oAuth token for you.
 
 .. code-block:: bash
 
     clan
 
-By default this token will be named `analytics.dat`. I suggest you move this file to `~/.google_analytics_auth.dat`. clan will always look for the auth in that location so you will only need one copy no matter what directory you are running clan from.
+By default this token will be named :code:`analytics.dat`. I suggest you move this file to :code:`~/.google_analytics_auth.dat`. clan will always look for the auth in that location so you will only need one copy no matter what directory you are running clan from.
     
 Usage
 =====
