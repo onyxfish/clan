@@ -1,14 +1,11 @@
 clan
 ----
 
-A command line utility for working with Google Analytics.
+A command line utility for generating reports from Google Analytics.
 
-Configuration: see `clan.yaml`.
+Important links:
 
-Write JSON:
+* Repository:    https://github.com/onyxfish/clan
+* Issues:        https://github.com/onyxfish/clan/issues
+* Documentation: http://clan.rtfd.org/
 
-    python clan.py -f json analytics.json
-
-Write txt:
-
-    python clan.py -f txt -d analytics.json analytics.txt

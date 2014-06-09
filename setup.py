@@ -6,7 +6,7 @@ from setuptools import setup
 install_requires = [
     'google-api-python-client==1.2',
     'httplib2==0.9',
-    'pyyaml==3.1.1'
+    'pyyaml==3.11'
 ]
 
 if sys.version_info < (2, 7):
