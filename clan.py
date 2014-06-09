@@ -58,7 +58,7 @@ class Clan(object):
             self.config = yaml.load(f)
 
         if 'property-id' not in self.config:
-            raise 'Property ID is required.'
+            raise Exception('Property ID is required.')
 
     def _install_exception_handler(self):
         """
@@ -153,11 +153,17 @@ class Clan(object):
             results = self.query(
                 metrics=analytic['metrics'],
                 dimensions=analytic.get('dimensions', []),
-                sort=analytic.get('sort', [])
+                filters=analytic.get('filters', None),
+                sort=analytic.get('sort', []),
+                start_index=analytic.get('start-index', 1),
+                max_results=analytic.get('max-results', 10)
             )
 
             data = {
                 'config': analytic,
+                'sampled': results.get('containsSampledData', False),
+                'sampleSize': results.get('sampleSize', None),
+                'sampleSpace': results.geT('sampleSpace', None),
                 'data': OrderedDict()
             }
                     
@@ -170,8 +176,16 @@ class Clan(object):
                     for row in results.get('rows', []):
                         column = i + dimensions_len
                         label = ','.join(row[:dimensions_len]) 
+                        data_type = results['columnHeaders'][column]['dataType']
 
-                        data['data'][metric][label] = int(row[column])
+                        if data_type == 'INTEGER':
+                            value = int(row[column])
+                        elif data_type == 'TIME':  
+                            value = float(row[column])
+                        else:
+                            raise Exception('Unknown metric data type: %s' % data_type)
+
+                        data['data'][metric][label] = value 
 
                 data['data'][metric]['all'] = results['totalsForAllResults'][metric]
 

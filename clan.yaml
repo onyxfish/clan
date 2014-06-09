@@ -57,4 +57,33 @@ analytics:
           - "ga:pagePath"
       sort:
           - "-ga:pageviews"
-
+    - name: Performance
+      metrics:
+          - "ga:avgPageLoadTime"
+          - "ga:avgPageDownloadTime"
+          - "ga:avgDomInteractiveTime"
+          - "ga:avgDomContentLoadedTime"
+    - name: Time on site
+      metrics:
+          - "ga:avgSessionDuration"
+    - name: Time on site by device category
+      metrics:
+          - "ga:avgSessionDuration"
+      dimensions:
+          - "ga:deviceCategory"
+      sort:
+          - "-ga:avgSessionDuration"
+    - name: "Event: tweet"
+      metrics:
+          - "ga:totalEvents"
+          - "ga:uniqueEvents"
+      dimensions:
+          - "ga:eventLabel"
+      filters: "ga:eventAction==tweet"
+    - name: "Event: facebook"
+      metrics:
+          - "ga:totalEvents"
+          - "ga:uniqueEvents"
+      dimensions:
+          - "ga:eventLabel"
+      filters: "ga:eventAction==facebook"
