@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 import argparse
-import datetime
+from collections import OrderedDict
 import httplib2
+import json
 import os
 import sys 
 
@@ -11,6 +12,7 @@ from oauth2client import client
 from oauth2client.clientsecrets import InvalidClientSecretsError
 from oauth2client.file import Storage
 from oauth2client import tools
+import yaml
 
 CLIENT_SECRETS = os.path.expanduser('~/.google_analytics_secrets.json')
 DAT = os.path.expanduser('~/.google_analytics_auth.dat')
@@ -21,7 +23,9 @@ SCOPE = 'https://www.googleapis.com/auth/analytics.readonly'
 NPR_ORG_LIVE_ID = '53470309'
 
 class Clan(object):
-
+    """
+    Command-line interface to Google Analytics.
+    """
     def __init__(self, args=None, output_file=None):
         """
         Setup.
@@ -32,8 +36,17 @@ class Clan(object):
             parents=[tools.argparser]
         )
 
-        self.argparser.add_argument('-n', '--names', dest='names_only', action='store_true',
-            help='Display column names and indices from the input CSV and exit.')
+        self.argparser.add_argument(
+            '-c', '--config',
+            dest='config_path', action='store', default='clan.yaml',
+            help='Path to a YAML configuration file.'
+        )
+
+        self.argparser.add_argument(
+            '-v', '--verbose',
+            dest='verbose', action='store_true',
+            help='Print detailed tracebacks when errors occur.'
+        )
 
         self.args = self.argparser.parse_args(args)
 
@@ -41,11 +54,11 @@ class Clan(object):
 
         self.service = self._authorize()
 
-        self.property_id = NPR_ORG_LIVE_ID 
-        self.domain = None 
-        self.slug = None
-        self.start_date = None
-        self.end_date = None
+        with open(self.args.config_path) as f:
+            self.config = yaml.load(f)
+
+        if 'property-id' not in self.config:
+            raise 'Property ID is required.'
 
     def _install_exception_handler(self):
         """
@@ -86,29 +99,29 @@ class Clan(object):
         Execute a query
         """
         if start_date:
-            start_date = start_date.strftime('%Y-%m-%d')
-        elif self.start_date:
-            start_date = self.start_date.strftime('%Y-%m-%d')
+            start_date = start_date
+        elif self.config.get('start-date', None):
+            start_date = self.config['start-date']
         else:
             start_date = '2005-01-01'
 
         if end_date:
-            end_date = end_date.strftime('%Y-%m-%d')
-        elif self.end_date:
-            end_date = self.end_date.strftime('%Y-%m-%d')
+            end_date = end_date
+        elif self.config.get('end-date', None):
+            end_date = self.config['end-date']
         else:
             end_date = 'today' 
 
-        if self.domain:
-            domain_filter = 'ga:hostname=%s' % self.domain
+        if self.config.get('domain', None):
+            domain_filter = 'ga:hostname=%s' % self.config['domain']
 
             if filters:
                 filters = '%s;%s' % (domain_filter, filters)
             else:
                 filters = domain_filter
 
-        if self.slug:
-            slug_filter = 'ga:pagePath=~^/%s/' % self.slug
+        if self.config.get('slug', None):
+            slug_filter = 'ga:pagePath=~^/%s/' % self.config['slug']
                 
             if filters:
                 filters = '%s;%s' % (slug_filter, filters)
@@ -116,7 +129,7 @@ class Clan(object):
                 filters = slug_filter
 
         return self.service.data().ga().get(
-            ids='ga:' + self.property_id,
+            ids='ga:' + self.config['property-id'],
             start_date=start_date,
             end_date=end_date,
             metrics=','.join(metrics) or None,
@@ -129,11 +142,44 @@ class Clan(object):
 
 
     def main(self):
-        print self.query(
-            start_date=datetime.date(2014, 6, 1),
-            metrics=['ga:pageviews']
-        ) 
-                
+        output = {
+            'property-id': self.config['property-id'],
+            'analytics': [] 
+        }
+
+        for analytic in self.config.get('analytics', []):
+            print 'Querying "%s"' % analytic['name']
+
+            results = self.query(
+                metrics=analytic['metrics'],
+                dimensions=analytic.get('dimensions', []),
+                sort=analytic.get('sort', [])
+            )
+
+            data = {
+                'config': analytic,
+                'data': OrderedDict()
+            }
+                    
+            dimensions_len = len(analytic.get('dimensions', []))
+
+            for i, metric in enumerate(analytic['metrics']):
+                data['data'][metric] = OrderedDict()
+
+                if dimensions_len:
+                    for row in results.get('rows', []):
+                        column = i + dimensions_len
+                        label = ','.join(row[:dimensions_len]) 
+
+                        data['data'][metric][label] = int(row[column])
+
+                data['data'][metric]['all'] = results['totalsForAllResults'][metric]
+
+            output['analytics'].append(data)
+
+        with open('analytics.json', 'w') as f:
+            json.dump(output, f, indent=4)
+
 def _main():
     clan = Clan()
     clan.main()

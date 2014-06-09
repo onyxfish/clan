@@ -1,0 +1,60 @@
+# Globals
+property-id: "53470309"
+start-date: "2014-06-01"
+
+# Metrics
+analytics:
+    - name: Totals
+      metrics:
+          - "ga:pageviews"
+          - "ga:uniquePageviews"
+          - "ga:users"
+          - "ga:sessions"
+    - name: Totals by device category
+      metrics:
+          - "ga:pageviews"
+          - "ga:uniquePageviews"
+          - "ga:users"
+          - "ga:sessions"
+      dimensions:
+          - "ga:deviceCategory"
+      sort:
+          - "-ga:pageviews"
+    - name: Totals by browser 
+      metrics:
+          - "ga:pageviews"
+          - "ga:uniquePageviews"
+          - "ga:users"
+          - "ga:sessions"
+      dimensions:
+          - "ga:browser"
+      sort:
+          - "-ga:pageviews"
+    - name: Totals by source 
+      metrics:
+          - "ga:pageviews"
+          - "ga:uniquePageviews"
+          - "ga:users"
+          - "ga:sessions"
+      dimensions:
+          - "ga:source"
+      sort:
+          - "-ga:pageviews"
+    - name: Totals by social network 
+      metrics:
+          - "ga:pageviews"
+          - "ga:uniquePageviews"
+          - "ga:users"
+          - "ga:sessions"
+      dimensions:
+          - "ga:socialNetwork"
+      sort:
+          - "-ga:pageviews"
+    - name: Top pages 
+      metrics:
+          - "ga:pageviews"
+      dimensions:
+          - "ga:pagePath"
+      sort:
+          - "-ga:pageviews"
+
