@@ -106,6 +106,57 @@ You can also convert an existing JSON report to text, like so:
 
     clan -f txt -d analytics.json analytics.txt
 
+Here is sample output for the above configuration:
+
+.. code-block::
+
+    Report run 2014-06-06 with:
+        property-id: 53470309
+        start-date: 2014-06-01
+
+    Totals
+
+        ga:pageviews
+         26,549,529    100.0%    total
+
+        ga:uniquePageviews
+         16,650,481    100.0%    total
+
+        ga:users
+          6,778,073    100.0%    total
+
+        ga:sessions
+         11,228,183    100.0%    total
+
+
+    Totals by device category
+    (using 89.0% of data as sample)
+
+        ga:pageviews
+         19,651,273     74.7%    desktop
+          4,850,906     18.4%    mobile
+          1,802,445      6.9%    tablet
+         26,304,624    100.0%    total
+
+        ga:uniquePageviews
+         10,764,238     65.3%    desktop
+          4,237,022     25.7%    mobile
+          1,484,038      9.0%    tablet
+         16,485,298    100.0%    total
+
+        ga:users
+          3,741,112     54.8%    desktop
+          2,357,376     34.5%    mobile
+            726,753     10.6%    tablet
+          6,825,241    100.0%    total
+
+        ga:sessions
+          6,492,857     58.4%    desktop
+          3,548,599     31.9%    mobile
+          1,079,451      9.7%    tablet
+         11,120,907    100.0%    total
+
+
 Authors
 =======
 
