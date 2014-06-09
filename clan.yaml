@@ -1,6 +1,9 @@
 # Globals
 property-id: "53470309"
 start-date: "2014-06-01"
+#end-date: "2014-06-04"
+#domain: "apps.npr.org"
+#prefix: "/commencement/"
 
 # Metrics
 analytics:
@@ -48,6 +51,7 @@ analytics:
           - "ga:pagePath"
       sort:
           - "-ga:pageviews"
+      max-results: 20
     - name: Performance
       metrics:
           - "ga:avgPageLoadTime"

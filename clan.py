@@ -2,6 +2,7 @@
 
 import argparse
 from collections import OrderedDict
+from datetime import datetime
 import httplib2
 import json
 import os
@@ -27,8 +28,7 @@ class Clan(object):
         Setup.
         """
         self.argparser = argparse.ArgumentParser(
-            description='TKTK',
-            epilog='TKTK',
+            description='A command-line interface to Google Analytics',
             parents=[tools.argparser]
         )
 
@@ -41,7 +41,7 @@ class Clan(object):
         self.argparser.add_argument(
             '-d', '--data',
             dest='data_path', action='store', default=None,
-            help='Path to a existing data file.'
+            help='Path to a existing JSON report file.'
         )
 
         self.argparser.add_argument(
@@ -121,20 +121,20 @@ class Clan(object):
             end_date = 'today' 
 
         if self.config.get('domain', None):
-            domain_filter = 'ga:hostname=%s' % self.config['domain']
+            domain_filter = 'ga:hostname==%s' % self.config['domain']
 
             if filters:
                 filters = '%s;%s' % (domain_filter, filters)
             else:
                 filters = domain_filter
 
-        if self.config.get('slug', None):
-            slug_filter = 'ga:pagePath=~^/%s/' % self.config['slug']
+        if self.config.get('prefix', None):
+            prefix_filter = 'ga:pagePath=~^%s' % self.config['prefix']
                 
             if filters:
-                filters = '%s;%s' % (slug_filter, filters)
+                filters = '%s;%s' % (prefix_filter, filters)
             else:
-                filters = slug_filter
+                filters = prefix_filter
 
         return self.service.data().ga().get(
             ids='ga:' + self.config['property-id'],
@@ -154,6 +154,10 @@ class Clan(object):
         """
         output = {
             'property-id': self.config['property-id'],
+            'start-date': self.config['start-date'],
+            'end-date': self.config['end-date'],
+            'domain': self.config['domain'],
+            'prefix': self.config['prefix'],
             'analytics': [] 
         }
 
@@ -242,6 +246,14 @@ class Clan(object):
         """
         Write report data to a human-readable text file.
         """
+        f.write('Report run %s with:\n' % datetime.now().strftime('%Y-%m-%m'))
+    
+        for var in ['property-id', 'start-date', 'end-date', 'domain', 'prefix']:
+            if report.get(var, None):
+                f.write('    %s: %s\n' % (var , report[var]))
+
+        f.write('\n')
+
         for analytic in report['analytics']:
             f.write('%s\n' % analytic['config']['name'])
 
