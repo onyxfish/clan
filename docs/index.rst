@@ -17,6 +17,10 @@ If you only want to use clan, install it this way::
 
     pip install clan 
 
+.. note::
+
+    clan is intended for **researchers** and **analysts**. You will need to understand the Google Analytics API in order to use it effectively. It is not intended to generate reports for your boss.
+
 Developers
 ----------
 

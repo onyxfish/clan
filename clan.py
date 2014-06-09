@@ -217,7 +217,7 @@ class Clan(object):
             def cast_data_type(d, dt):
                 if dt == 'INTEGER':
                     return int(d)
-                elif data_type == 'TIME' or data_type == 'FLOAT':  
+                elif data_type in ['TIME', 'FLOAT', 'CURRENCY', 'PERCENT']:  
                     return float(d)
                 else:
                     raise Exception('Unknown metric data type: %s' % data_type)
@@ -299,9 +299,12 @@ class Clan(object):
                     if data_type == 'INTEGER':
                         pct = self._percent(value, total) if total > 0 else '0.0%' 
                         value = self._comma(value)
-                    elif data_type == 'TIME' or data_type == 'FLOAT':
+                    elif data_type == 'TIME':
                         pct = '-'
                         value = self._duration(value)
+                    elif data_type in ['FLOAT', 'CURRENCY', 'PERCENT']:
+                        pct = '-'
+                        value = '%.1f' % value
 
                     f.write('{:>15s}    {:>6s}    {:s}\n'.format(value, pct, label))
 
