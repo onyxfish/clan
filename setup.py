@@ -14,7 +14,7 @@ if sys.version_info < (2, 7):
 
 setup(
     name='clan',
-    version='0.1.0',
+    version='0.1.1',
     description='A command line utility for working with Google Analytics.',
     long_description=open('README').read(),
     author='Christopher Groskopf',
