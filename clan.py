@@ -11,7 +11,6 @@ from time import sleep
 
 from apiclient import discovery
 from oauth2client import client
-from oauth2client.clientsecrets import InvalidClientSecretsError
 from oauth2client.file import Storage
 from oauth2client import tools
 import yaml
@@ -31,13 +30,13 @@ class Clan(object):
 
         self.argparser.add_argument(
             '--auth',
-            dest='auth', action='store', default=os.path.expanduser('~/.google_analytics_auth.dat'),
+            dest='auth', action='store',
             help='Path to the authorized credentials file (analytics.dat).'
         )
 
         self.argparser.add_argument(
             '--secrets',
-            dest='secrets', action='store', default=os.path.expanduser('~/.google_analytics_secrets.json'),
+            dest='secrets', action='store',
             help='Path to the authorization secrets file (client_secrets.json).'
         )
 
@@ -67,11 +66,27 @@ class Clan(object):
 
         self.argparser.add_argument(
             'output',
-            action='store',
+            nargs='?', action='store',
             help='Output file path.'
         )
 
         self.args = self.argparser.parse_args(args)
+
+        if not self.args.auth:
+            home_path = os.path.expanduser('~/.google_analytics_auth.dat')
+
+            if os.path.exists('analytics.dat'):
+                self.args.auth = 'analytics.dat'
+            elif os.path.exists(home_path):
+                self.args.auth = home_path
+
+        if not self.args.secrets:
+            home_path = os.path.expanduser('~/.google_analytics_secrets.json')
+
+            if os.path.exists('client_secrets.json'):
+                self.args.secrets = 'client_secrets.json'
+            elif os.path.exists(home_path):
+                self.args.secrets = home_path
 
         self._install_exception_handler()
 
@@ -93,17 +108,20 @@ class Clan(object):
         """
         Authorize with OAuth2.
         """
-        storage = Storage(self.args.auth)
-        credentials = storage.get()
+        if self.args.auth:
+            storage = Storage(self.args.auth)
+            credentials = storage.get()
+        else:
+            if not self.args.secrets:
+                raise Exception('Could not locate either analytics.dat or client_secrets.json')
         
-        if not credentials or credentials.invalid:
-            try:
-                flow = client.flow_from_clientsecrets(
-                    self.args.secrets,
-                    scope='https://www.googleapis.com/auth/analytics.readonly'
-                )
-            except InvalidClientSecretsError:
-                print 'Client secrets not found at %s' % self.args.secrets
+        if not self.args.auth or not credentials or credentials.invalid:
+            storage = Storage('analytics.dat')
+            
+            flow = client.flow_from_clientsecrets(
+                self.args.secrets,
+                scope='https://www.googleapis.com/auth/analytics.readonly'
+            )
             
             credentials = tools.run_flow(flow, storage, self.args)
             
@@ -292,6 +310,9 @@ class Clan(object):
             f.write('\n')
 
     def main(self):
+        if not self.args.output:
+            return
+
         if self.args.data_path:
             with open(self.args.data_path) as f:
                 data = json.load(f, object_pairs_hook=OrderedDict)
