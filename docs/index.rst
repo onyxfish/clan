@@ -31,7 +31,6 @@ If you are a developer that also wants to hack on clan, install it this way::
     mkvirtualenv --no-site-packages clan
     pip install -r requirements.txt
     python setup.py develop
-    nosetests
 
 .. note::
 
