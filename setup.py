@@ -36,7 +36,6 @@ setup(
         'Topic :: Utilities'
     ],
     packages=[
-        'clan'
     ],
     entry_points ={
         'console_scripts': [
