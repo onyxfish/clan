@@ -88,7 +88,7 @@ To configure clan, create a YAML data file describing the analytics you want to 
 
     For details about all metrics you can report on, see the `Google Analytics Core Reporting API docs <https://developers.google.com/analytics/devguides/reporting/core/dimsmets>`_.
 
-To run this report to a JSON file, run the following command. Note that by default clan will look for a YAML file called :code:`clan.yml`. You can override this with the `-c` option.
+To run this report to a JSON file, run the following command. Note that by default clan will look for a YAML file called :code:`clan.yml`. You can override this with the :code:`-c` option.
 
 .. code-block:: bash
 
