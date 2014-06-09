@@ -21,7 +21,6 @@ DAT = os.path.expanduser('~/.google_analytics_auth.dat')
 SERVICE_NAME = 'analytics'
 SERVICE_VERSION = 'v3'
 SCOPE = 'https://www.googleapis.com/auth/analytics.readonly'
-NPR_ORG_LIVE_ID = '53470309'
 
 class Clan(object):
     """

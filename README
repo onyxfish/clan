@@ -3,6 +3,8 @@ clan
 
 A command line utility for working with Google Analytics.
 
+Configuration: see `clan.yaml`.
+
 Write JSON:
 
     python clan.py -f json analytics.json
