@@ -21,11 +21,11 @@ def format_duration(secs):
     """
     secs = int(secs)
 
-    if secs > 60:
-        mins = secs / 60
-        secs = secs - (mins * 60)
+    if abs(secs) > 60:
+        mins = abs(secs) / 60
+        secs = abs(secs) - (mins * 60)
 
-        return '%im %02is' % (mins, secs)
+        return '%s%im %02is' % ('-' if secs < 0 else '', mins, secs)
 
     return '%is' % secs
 

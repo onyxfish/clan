@@ -3,7 +3,7 @@
 from collections import OrderedDict
 import json
 
-from commands.utils import GLOBAL_ARGUMENTS, format_comma, format_duration, format_percent
+from commands.utils import GLOBAL_ARGUMENTS, format_comma, format_duration
 
 class DiffCommand(object):
     def __init__(self):
@@ -135,35 +135,42 @@ class DiffCommand(object):
             if diff['b'].get(var, None):
                 f.write('    %s: %s\n' % (var , diff['b'][var]))
 
-        TODO="""
         for analytic in diff['queries']:
             f.write('%s\n' % analytic['config']['name'])
 
-            if analytic['sampled']:
-                f.write('(using {:.1%} of data as sample)\n'.format(float(analytic['sampleSize']) / analytic['sampleSpace']))
-                
             f.write('\n')
 
             for metric, data in analytic['data'].items():
                 f.write('    %s\n' % metric)
 
                 data_type = analytic['data_types'][metric]
-                total = data['total']
 
-                for label, value in data.items():
+                for label, values in data.items():
+                    a = values['a']
+                    b = values['b']
+
+                    change = b - a 
+
                     if data_type == 'INTEGER':
-                        pct = format_percent(value, total) if total > 0 else '0.0%' 
-                        value = format_comma(value)
+                        pct_a = float(a) / data['total']['a'] if data['total']['a'] > 0 else 0.0 
+                        pct_b = float(b) / data['total']['b'] if data['total']['b'] > 0 else 0.0
+
+                        pct = '{:.1f}'.format((pct_b - pct_a) * 100)
+
+                        value = format_comma(change)
                     elif data_type == 'TIME':
                         pct = '-'
-                        value = format_duration(value)
+                        value = format_duration(change)
                     elif data_type in ['FLOAT', 'CURRENCY', 'PERCENT']:
                         pct = '-'
-                        value = '%.1f' % value
+                        value = '%.1f' % change 
+
+                    if change > 0:
+                        value = '+%s' % value 
 
                     f.write('{:>15s}    {:>6s}    {:s}\n'.format(value, pct, label))
 
                 f.write('\n')
 
-            f.write('\n')"""
+            f.write('\n')
 
