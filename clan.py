@@ -237,16 +237,16 @@ class Clan(object):
             'end-date': self.args.end_date or self.config.get('end-date', None),
             'domain': self.args.domain or self.config.get('domain', None),
             'prefix': self.args.prefix or self.config.get('prefix', None),
-            'analytics': [] 
+            'queries': [] 
         }
 
-        for analytic in self.config.get('analytics', []):
+        for analytic in self.config.get('queries', []):
             print 'Querying "%s"' % analytic['name']
 
             results = self.query(
                 metrics=analytic['metrics'],
                 dimensions=analytic.get('dimensions', []),
-                filters=analytic.get('filters', None),
+                filters=analytic.get('filter', None),
                 sort=analytic.get('sort', []),
                 start_index=analytic.get('start-index', 1),
                 max_results=analytic.get('max-results', 10)
@@ -291,7 +291,7 @@ class Clan(object):
                 # Prevent rate-limiting
                 sleep(1)
 
-            output['analytics'].append(data)
+            output['queries'].append(data)
 
         return output
 
@@ -333,7 +333,7 @@ class Clan(object):
 
         f.write('\n')
 
-        for analytic in report['analytics']:
+        for analytic in report['queries']:
             f.write('%s\n' % analytic['config']['name'])
 
             if analytic['sampled']:

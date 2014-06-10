@@ -49,10 +49,10 @@ Once you've got a :code:`client_secrets.json` file, simple run clan and it will 
 
 By default this token will be named :code:`analytics.dat`. I suggest you move this file to :code:`~/.google_analytics_auth.dat`. clan will always look for the auth in that location so you will only need one copy no matter what directory you are running clan from.
     
-Usage
-=====
+Basic usage
+===========
 
-clan has two basic modes, 1) writing analytics data to a JSON file suitable for further processing and 2) writing data to a text report suitable for review or sending in an email. 
+clan has two basic modes, 1) writing analytics data to a JSON file suitable for further processing and 2) writing data to a text report suitable for reading or emailing. 
 
 To configure clan, create a YAML data file describing the analytics you want to run:
 
@@ -61,12 +61,10 @@ To configure clan, create a YAML data file describing the analytics you want to 
     # Global configuration, only property-id is required
     property-id: "53470309"
     start-date: "2014-06-01"
-    end-date: "2014-06-04"
-    domain: "apps.npr.org"
     prefix: "/commencement/"
 
     # Metrics to report
-    analytics:
+    queries:
         - name: Totals
           metrics:
               - "ga:pageviews"
@@ -85,11 +83,7 @@ To configure clan, create a YAML data file describing the analytics you want to 
           sort:
               - "-ga:pageviews"
 
-.. note::
-
-    For details about all metrics you can report on, see the `Google Analytics Core Reporting API docs <https://developers.google.com/analytics/devguides/reporting/core/dimsmets>`_.
-
-To run this report to a JSON file, run the following command. Note that by default clan will look for a YAML file called :code:`clan.yml`. You can override this with the :code:`-c` option.
+To run this report to a JSON file, run the following command. Note that by default clan will look for a YAML file called :code:`clan.yml`. You can override this with the :code:`-c` option. For complete documenation of this configuration, see :doc:`Configuration <configuration>`.
 
 .. code-block:: bash
 
@@ -162,6 +156,13 @@ Here is sample output for the above configuration::
               7,644     28.5%    mobile
               3,159     11.8%    tablet
              26,817    100.0%    total
+
+Advanced usage
+==============
+
+.. toctree::
+
+    configuration
 
 Authors
 =======

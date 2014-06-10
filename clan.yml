@@ -6,7 +6,7 @@ start-date: "2014-06-01"
 prefix: "/commencement/"
 
 # Metrics
-analytics:
+queries:
     - name: Totals
       metrics:
           - "ga:pageviews"
@@ -43,4 +43,4 @@ analytics:
       dimensions:
           - "ga:eventLabel"
           - "ga:customVarValue1"
-      filters: "ga:eventAction==tweet"
+      filter: "ga:eventAction==tweet"
