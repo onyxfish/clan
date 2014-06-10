@@ -3,7 +3,7 @@
 from collections import OrderedDict
 import json
 
-from commands.utils import GLOBAL_ARGUMENTS
+from commands.utils import GLOBAL_ARGUMENTS, format_comma, format_duration, format_percent
 
 class DiffCommand(object):
     def __init__(self):
@@ -83,11 +83,15 @@ class DiffCommand(object):
         Generate a diff for two data reports.
         """
 
+        arguments = GLOBAL_ARGUMENTS + ['run_date']
+
         output = OrderedDict([
-            ('a', OrderedDict([(arg, report_a[arg]) for arg in GLOBAL_ARGUMENTS])),
-            ('b', OrderedDict([(arg, report_b[arg]) for arg in GLOBAL_ARGUMENTS])),
+            ('a', OrderedDict([(arg, report_a[arg]) for arg in arguments])),
+            ('b', OrderedDict([(arg, report_b[arg]) for arg in arguments])),
             ('queries', [])
         ])
+
+        output['a']
 
         for query_a in report_a['queries']:
             for query_b in report_b['queries']:
@@ -113,10 +117,53 @@ class DiffCommand(object):
 
         return output 
 
-    def txt_diff(self, diff):
+    def txt_diff(self, diff, f):
         """
         Generate a text report for a diff.
         """
-        pass
+        f.write('Comparing report A run %s with:\n' % diff['a']['run_date'])
+    
+        for var in GLOBAL_ARGUMENTS:
+            if diff['a'].get(var, None):
+                f.write('    %s: %s\n' % (var , diff['a'][var]))
 
+        f.write('\n')
+
+        f.write('With report B run %s with:\n' % diff['b']['run_date'])
+
+        for var in GLOBAL_ARGUMENTS:
+            if diff['b'].get(var, None):
+                f.write('    %s: %s\n' % (var , diff['b'][var]))
+
+        TODO="""
+        for analytic in diff['queries']:
+            f.write('%s\n' % analytic['config']['name'])
+
+            if analytic['sampled']:
+                f.write('(using {:.1%} of data as sample)\n'.format(float(analytic['sampleSize']) / analytic['sampleSpace']))
+                
+            f.write('\n')
+
+            for metric, data in analytic['data'].items():
+                f.write('    %s\n' % metric)
+
+                data_type = analytic['data_types'][metric]
+                total = data['total']
+
+                for label, value in data.items():
+                    if data_type == 'INTEGER':
+                        pct = format_percent(value, total) if total > 0 else '0.0%' 
+                        value = format_comma(value)
+                    elif data_type == 'TIME':
+                        pct = '-'
+                        value = format_duration(value)
+                    elif data_type in ['FLOAT', 'CURRENCY', 'PERCENT']:
+                        pct = '-'
+                        value = '%.1f' % value
+
+                    f.write('{:>15s}    {:>6s}    {:s}\n'.format(value, pct, label))
+
+                f.write('\n')
+
+            f.write('\n')"""
 

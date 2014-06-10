@@ -11,7 +11,7 @@ from apiclient import discovery
 import httplib2
 from oauth2client.file import Storage
 
-from commands.utils import GLOBAL_ARGUMENTS
+from commands.utils import GLOBAL_ARGUMENTS, format_comma, format_duration, format_percent
 
 class ReportCommand(object):
     def __init__(self):
@@ -134,7 +134,6 @@ class ReportCommand(object):
 
         return parser
 
-
     def _ndays(self, start_date, ndays):
         """
         Compute an end date given a start date and a number of days.
@@ -226,6 +225,7 @@ class ReportCommand(object):
         for arg in GLOBAL_ARGUMENTS:
             output[arg] = getattr(self.args, arg) or self.config.get(arg, None)
 
+        output['run_date'] = datetime.now().strftime('%Y-%m-%d')
         output['queries'] = []
 
         for analytic in self.config.get('queries', []):
@@ -283,41 +283,15 @@ class ReportCommand(object):
 
         return output
 
-    def _duration(self, secs):
-        """
-        Format a duration in seconds as minutes and seconds.
-        """
-        secs = int(secs)
-
-        if secs > 60:
-            mins = secs / 60
-            secs = secs - (mins * 60)
-
-            return '%im %02is' % (mins, secs)
-
-        return '%is' % secs
-
-    def _comma(self, d):
-        """
-        Format a comma separated number.
-        """
-        return '{:,d}'.format(d)
-
-    def _percent(self, d, t):
-        """
-        Format a value as a percent of a total.
-        """
-        return '{:.1%}'.format(float(d) / t)
-
     def txt(self, report, f):
         """
         Write report data to a human-readable text file.
         """
-        f.write('Report run %s with:\n' % datetime.now().strftime('%Y-%m-%m'))
+        f.write('Report run %s with:\n' % report['run_date'])
     
         for var in GLOBAL_ARGUMENTS:
             if report.get(var, None):
-                f.write('    %s: %s\n' % (var , report[var]))
+                f.write('    %s: %s\n' % (var, report[var]))
 
         f.write('\n')
 
@@ -337,11 +311,11 @@ class ReportCommand(object):
 
                 for label, value in data.items():
                     if data_type == 'INTEGER':
-                        pct = self._percent(value, total) if total > 0 else '0.0%' 
-                        value = self._comma(value)
+                        pct = format_percent(value, total) if total > 0 else '0.0%' 
+                        value = format_comma(value)
                     elif data_type == 'TIME':
                         pct = '-'
-                        value = self._duration(value)
+                        value = format_duration(value)
                     elif data_type in ['FLOAT', 'CURRENCY', 'PERCENT']:
                         pct = '-'
                         value = '%.1f' % value
