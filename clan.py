@@ -19,9 +19,9 @@ class Clan(object):
     """
     Command-line interface to Google Analytics.
     """
-    def __init__(self, args=None, output_file=None):
+    def __init__(self):
         """
-        Setup.
+        Setup and parse command line arguments.
         """
         self._install_exception_handler()
 
@@ -120,7 +120,7 @@ class Clan(object):
             help='Output file path.'
         )
         
-        self.args = self.argparser.parse_args(args)
+        self.args = self.argparser.parse_args()
         self.args.func()
 
     def _install_exception_handler(self):
@@ -144,6 +144,7 @@ class Clan(object):
 
         d = date(*map(int, start_date.split('-')))
         d += timedelta(days=ndays)
+
         return d.strftime('%Y-%m-%d')
 
     def query(self, start_date=None, end_date=None, ndays=None, metrics=[], dimensions=[], filters=None, sort=[], start_index=1, max_results=10):
