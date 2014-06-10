@@ -47,7 +47,12 @@ The start date of all queries, in YYYY-MM-DD format.
 end-date
 --------
 
-The end date of all queries, in YYYY-MM-DD format.
+The end date of all queries, in YYYY-MM-DD format. Supersedes :code:`ndays` if both are specified.
+
+ndays
+-----
+
+A number of days from the start date to report on. Superseded by :code:`end-date` if both are specified. 
 
 domain
 ------
