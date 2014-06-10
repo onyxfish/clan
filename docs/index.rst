@@ -73,6 +73,7 @@ To configure clan, create a YAML data file describing the analytics you want to 
               - "ga:uniquePageviews"
               - "ga:users"
               - "ga:sessions"
+
         - name: Totals by device category
           metrics:
               - "ga:pageviews"
@@ -93,6 +94,12 @@ To run this report to a JSON file, run the following command. Note that by defau
 .. code-block:: bash
 
     clan -f json analytics.json
+
+Global configuration can also be specified as command arguments, allowing you to reuse a YAML configuration file for several properties or page sets. When specified, command-line arguments will always take precedence over variables in the YAML configuration.
+
+.. code-block:: bash
+
+    clan -f json --start-date 2014-05-1 --prefix /tshirt/ analytics.json 
 
 To instead produce a text report, run:
 

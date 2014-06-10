@@ -28,6 +28,7 @@ class Clan(object):
             parents=[tools.argparser]
         )
 
+        # Authentication
         self.argparser.add_argument(
             '--auth',
             dest='auth', action='store',
@@ -40,6 +41,7 @@ class Clan(object):
             help='Path to the authorization secrets file (client_secrets.json).'
         )
 
+        # General configuration
         self.argparser.add_argument(
             '-c', '--config',
             dest='config_path', action='store', default='clan.yml',
@@ -64,6 +66,38 @@ class Clan(object):
             help='Print detailed tracebacks when errors occur.'
         )
 
+        # Query configuration
+        self.argparser.add_argument(
+            '--property-id',
+            dest='property_id', action='store',
+            help='Google Analytics ID of the property to query.'
+        )
+
+        self.argparser.add_argument(
+            '--start-date',
+            dest='start_date', action='store',
+            help='Start date for the query in YYYY-MM-DD format.'
+        )
+
+        self.argparser.add_argument(
+            '--end-date',
+            dest='end_date', action='store',
+            help='End date for the query in YYYY-MM-DD format.'
+        )
+
+        self.argparser.add_argument(
+            '--domain',
+            dest='domain', action='store',
+            help='Restrict results to only urls with this domain.'
+        )
+
+        self.argparser.add_argument(
+            '--prefix',
+            dest='prefix', action='store',
+            help='Restrict results to only urls with this prefix.'
+        )
+
+        # Positionals
         self.argparser.add_argument(
             'output',
             nargs='?', action='store',
@@ -113,7 +147,7 @@ class Clan(object):
             credentials = storage.get()
         else:
             if not self.args.secrets:
-                raise Exception('Could not locate either analytics.dat or client_secrets.json')
+                raise Exception('Could not locate either analytics.dat or client_secrets.json. At least one must be provided.')
         
         if not self.args.auth or not credentials or credentials.invalid:
             storage = Storage('analytics.dat')
@@ -135,6 +169,8 @@ class Clan(object):
         """
         if start_date:
             start_date = start_date
+        elif self.args.start_date:
+            start_date = self.args.start_date
         elif self.config.get('start-date', None):
             start_date = self.config['start-date']
         else:
@@ -142,21 +178,37 @@ class Clan(object):
 
         if end_date:
             end_date = end_date
+        elif self.args.end_date:
+            end_date = self.args.end_date
         elif self.config.get('end-date', None):
             end_date = self.config['end-date']
         else:
             end_date = 'today' 
 
-        if self.config.get('domain', None):
-            domain_filter = 'ga:hostname==%s' % self.config['domain']
+        if self.args.domain:
+            domain = self.args.domain
+        elif self.config.get('domain', None):
+            domain = self.config['domain']
+        else:
+            domain = None
+
+        if domain:
+            domain_filter = 'ga:hostname==%s' % domain
 
             if filters:
                 filters = '%s;%s' % (domain_filter, filters)
             else:
                 filters = domain_filter
 
-        if self.config.get('prefix', None):
-            prefix_filter = 'ga:pagePath=~^%s' % self.config['prefix']
+        if self.args.prefix:
+            prefix = self.args.prefix
+        elif self.config.get('prefix', None):
+            prefix = self.config['prefix']
+        else:
+            prefix = None
+
+        if prefix:
+            prefix_filter = 'ga:pagePath=~^%s' % prefix 
                 
             if filters:
                 filters = '%s;%s' % (prefix_filter, filters)
@@ -180,11 +232,11 @@ class Clan(object):
         Query analytics and stash data in a format suitable for serializing.
         """
         output = {
-            'property-id': self.config['property-id'],
-            'start-date': self.config.get('start-date', None),
-            'end-date': self.config.get('end-date', None),
-            'domain': self.config.get('domain', None),
-            'prefix': self.config.get('prefix', None),
+            'property-id': self.args.property_id or self.config['property-id'],
+            'start-date': self.args.start_date or self.config.get('start-date', None),
+            'end-date': self.args.end_date or self.config.get('end-date', None),
+            'domain': self.args.domain or self.config.get('domain', None),
+            'prefix': self.args.prefix or self.config.get('prefix', None),
             'analytics': [] 
         }
 
