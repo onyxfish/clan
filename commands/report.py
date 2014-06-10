@@ -19,6 +19,122 @@ class ReportCommand(object):
         self.config = None
         self.service = None
 
+    def __call__(self, args):
+        self.args = args
+
+        if not self.args.auth:
+            home_path = os.path.expanduser('~/.clan_auth.dat')
+
+            if os.path.exists('analytics.dat'):
+                self.args.auth = 'analytics.dat'
+            elif os.path.exists(home_path):
+                self.args.auth = home_path
+            else:
+                raise Exception('Could not locate local authorization token (analytics.dat). Please specify it using --auth or run "clan auth".')
+
+        storage = Storage(self.args.auth)
+        credentials = storage.get()
+
+        if not credentials or credentials.invalid:
+            raise Exception('Invalid authentication. Please run "clan auth" to generate a new token.')
+
+        http = credentials.authorize(http=httplib2.Http())
+        self.service = discovery.build('analytics', 'v3', http=http)
+
+        if self.args.data_path:
+            with open(self.args.data_path) as f:
+                report = json.load(f, object_pairs_hook=OrderedDict)
+        else:
+            with open(self.args.config_path) as f:
+                self.config = yaml.load(f)
+
+            if 'property-id' not in self.config:
+                raise Exception('You must specify a property-id either in your YAML file or using the --property-id argument.')
+
+            report = self.report()
+
+        with open(self.args.output, 'w') as f:
+            if self.args.format == 'txt':
+                self.txt(report, f)
+            elif self.args.format == 'json':
+                json.dump(report, f, indent=4)
+
+    def add_argparser(self, root, parents):
+        """
+        Add arguments for this command.
+        """
+        parser = root.add_parser('report', parents=parents)
+        parser.set_defaults(func=self)
+
+        parser.add_argument(
+            '--auth',
+            dest='auth', action='store',
+            help='Path to the authorized credentials file (analytics.dat).'
+        )
+
+        parser.add_argument(
+            '-c', '--config',
+            dest='config_path', action='store', default='clan.yml',
+            help='Path to a YAML configuration file (clan.yml).'
+        )
+
+        parser.add_argument(
+            '-d', '--data',
+            dest='data_path', action='store', default=None,
+            help='Path to a existing JSON report file.'
+        )
+
+        parser.add_argument(
+            '-f', '--format',
+            dest='format', action='store', default='txt', choices=['txt', 'json'],
+            help='Output format.'
+        )
+
+        parser.add_argument(
+            '--property-id',
+            dest='property-id', action='store',
+            help='Google Analytics ID of the property to query.'
+        )
+
+        parser.add_argument(
+            '--start-date',
+            dest='start-date', action='store',
+            help='Start date for the query in YYYY-MM-DD format.'
+        )
+
+        parser.add_argument(
+            '--end-date',
+            dest='end-date', action='store',
+            help='End date for the query in YYYY-MM-DD format. Supersedes --ndays.'
+        )
+
+        parser.add_argument(
+            '--ndays',
+            dest='ndays', action='store', type=int,
+            help='The number of days from the start-date to query. Requires start-date. Superseded by end-date.'
+        )
+
+        parser.add_argument(
+            '--domain',
+            dest='domain', action='store',
+            help='Restrict results to only urls with this domain.'
+        )
+
+        parser.add_argument(
+            '--prefix',
+            dest='prefix', action='store',
+            help='Restrict results to only urls with this prefix.'
+        )
+
+        parser.add_argument(
+            'output',
+            action='store',
+            help='Output file path.'
+        )
+
+        return parser
+
+
     def _ndays(self, start_date, ndays):
         """
         Compute an end date given a start date and a number of days.
@@ -236,42 +352,3 @@ class ReportCommand(object):
 
             f.write('\n')
 
-    def __call__(self, args):
-        self.args = args
-
-        if not self.args.auth:
-            home_path = os.path.expanduser('~/.clan_auth.dat')
-
-            if os.path.exists('analytics.dat'):
-                self.args.auth = 'analytics.dat'
-            elif os.path.exists(home_path):
-                self.args.auth = home_path
-            else:
-                raise Exception('Could not locate local authorization token (analytics.dat). Please specify it using --auth or run "clan auth".')
-
-        storage = Storage(self.args.auth)
-        credentials = storage.get()
-
-        if not credentials or credentials.invalid:
-            raise Exception('Invalid authentication. Please run "clan auth" to generate a new token.')
-
-        http = credentials.authorize(http=httplib2.Http())
-        self.service = discovery.build('analytics', 'v3', http=http)
-
-        if self.args.data_path:
-            with open(self.args.data_path) as f:
-                report = json.load(f, object_pairs_hook=OrderedDict)
-        else:
-            with open(self.args.config_path) as f:
-                self.config = yaml.load(f)
-
-            if 'property-id' not in self.config:
-                raise Exception('You must specify a property-id either in your YAML file or using the --property-id argument.')
-
-            report = self.report()
-
-        with open(self.args.output, 'w') as f:
-            if self.args.format == 'txt':
-                self.txt(report, f)
-            elif self.args.format == 'json':
-                json.dump(report, f, indent=4)
