@@ -41,13 +41,13 @@ Authentication
 
 Before you use clan, you're going to need to setup your access to the Google Analytics API. Follow the `instructions in Google's docs <https://developers.google.com/analytics/solutions/articles/hello-analytics-api#register_project>`_ to register an application and create the :code:`client_secrets.json` file.
 
-Once you've got a :code:`client_secrets.json` file, simple run clan and it will acquire an oAuth token for you.
+Once you've got a :code:`client_secrets.json` file, clan will walk you through acquiring an oAuth token:
 
 .. code-block:: bash
 
-    clan
+    clan auth
 
-By default this token will be named :code:`analytics.dat`. I suggest you move this file to :code:`~/.google_analytics_auth.dat`. clan will always look for the auth in that location so you will only need one copy no matter what directory you are running clan from.
+By default this token will be named :code:`analytics.dat`. I suggest you move this file to :code:`~/.clan_auth.dat`. clan will always look for the auth in that location so you will only need one copy no matter what directory you are running clan from.
     
 Basic usage
 ===========
@@ -87,25 +87,25 @@ To run this report to a JSON file, run the following command. Note that by defau
 
 .. code-block:: bash
 
-    clan -f json analytics.json
+    clan report -f json analytics.json
 
 Global configuration can also be specified as command arguments, allowing you to reuse a YAML configuration file for several properties or page sets. When specified, command-line arguments will always take precedence over variables in the YAML configuration.
 
 .. code-block:: bash
 
-    clan -f json --start-date 2014-05-1 --prefix /tshirt/ analytics.json 
+    clan report -f json --start-date 2014-05-1 --prefix /tshirt/ analytics.json 
 
-To instead produce a text report, run:
+To instead produce a text report (the default), run:
 
 .. code-block:: bash
 
-    clan -f txt analytics.txt
+    clan report analytics.txt
     
 You can also convert an existing JSON report to text, like so:
 
 .. code-block:: bash
 
-    clan -f txt -d analytics.json analytics.txt
+    clan report -d analytics.json analytics.txt
 
 Here is sample output for the above configuration::
 

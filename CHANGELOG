@@ -1,6 +1,7 @@
 0.1.1
 -----
 
+* Refactored to use command structure for CLI.
 * --ndays argument. (#10)
 * Document all configuration options. (#13)
 * Allow global configuration on command line. (#12)

@@ -23,114 +23,105 @@ class Clan(object):
         """
         Setup.
         """
+        self._install_exception_handler()
+
         self.argparser = argparse.ArgumentParser(
-            description='A command-line interface to Google Analytics',
-            parents=[tools.argparser]
+            description='A command-line interface to Google Analytics'
         )
 
-        # Authentication
-        self.argparser.add_argument(
-            '--auth',
-            dest='auth', action='store',
-            help='Path to the authorized credentials file (analytics.dat).'
-        )
+        # Generic arguments
+        generic_parser = argparse.ArgumentParser(add_help=False)
 
-        self.argparser.add_argument(
-            '--secrets',
-            dest='secrets', action='store',
-            help='Path to the authorization secrets file (client_secrets.json).'
-        )
-
-        # General configuration
-        self.argparser.add_argument(
-            '-c', '--config',
-            dest='config_path', action='store', default='clan.yml',
-            help='Path to a YAML configuration file.'
-        )
-
-        self.argparser.add_argument(
-            '-d', '--data',
-            dest='data_path', action='store', default=None,
-            help='Path to a existing JSON report file.'
-        )
-
-        self.argparser.add_argument(
-            '-f', '--format',
-            dest='format', action='store', default='txt', choices=['txt', 'json'],
-            help='Output format.'
-        )
-
-        self.argparser.add_argument(
+        generic_parser.add_argument(
             '-v', '--verbose',
             dest='verbose', action='store_true',
             help='Print detailed tracebacks when errors occur.'
         )
 
-        # Query configuration
-        self.argparser.add_argument(
+        subparsers = self.argparser.add_subparsers()
+
+        # Authentication
+        parser_auth = subparsers.add_parser('auth', parents=[generic_parser, tools.argparser])
+        parser_auth.set_defaults(func=self.command_auth)
+
+        parser_auth.add_argument(
+            '--secrets',
+            dest='secrets', action='store',
+            help='Path to the authorization secrets file (client_secrets.json).'
+        )
+
+        # Reporting
+        parser_report = subparsers.add_parser('report', parents=[generic_parser])
+        parser_report.set_defaults(func=self.command_report)
+
+        parser_report.add_argument(
+            '--auth',
+            dest='auth', action='store',
+            help='Path to the authorized credentials file (analytics.dat).'
+        )
+
+        parser_report.add_argument(
+            '-c', '--config',
+            dest='config_path', action='store', default='clan.yml',
+            help='Path to a YAML configuration file (clan.yml).'
+        )
+
+        parser_report.add_argument(
+            '-d', '--data',
+            dest='data_path', action='store', default=None,
+            help='Path to a existing JSON report file.'
+        )
+
+        parser_report.add_argument(
+            '-f', '--format',
+            dest='format', action='store', default='txt', choices=['txt', 'json'],
+            help='Output format.'
+        )
+
+        parser_report.add_argument(
             '--property-id',
             dest='property_id', action='store',
             help='Google Analytics ID of the property to query.'
         )
 
-        self.argparser.add_argument(
+        parser_report.add_argument(
             '--start-date',
             dest='start_date', action='store',
             help='Start date for the query in YYYY-MM-DD format.'
         )
 
-        self.argparser.add_argument(
+        parser_report.add_argument(
             '--end-date',
             dest='end_date', action='store',
             help='End date for the query in YYYY-MM-DD format. Supersedes --ndays.'
         )
 
-        self.argparser.add_argument(
+        parser_report.add_argument(
             '--ndays',
             dest='ndays', action='store', type=int,
             help='The number of days from the start-date to query. Requires start-date. Superseded by end-date.'
         )
 
-        self.argparser.add_argument(
+        parser_report.add_argument(
             '--domain',
             dest='domain', action='store',
             help='Restrict results to only urls with this domain.'
         )
 
-        self.argparser.add_argument(
+        parser_report.add_argument(
             '--prefix',
             dest='prefix', action='store',
             help='Restrict results to only urls with this prefix.'
         )
 
-        # Positionals
-        self.argparser.add_argument(
+        parser_report.add_argument(
             'output',
-            nargs='?', action='store',
+            action='store',
             help='Output file path.'
         )
-
+        
         self.args = self.argparser.parse_args(args)
-
-        if not self.args.auth:
-            home_path = os.path.expanduser('~/.google_analytics_auth.dat')
-
-            if os.path.exists('analytics.dat'):
-                self.args.auth = 'analytics.dat'
-            elif os.path.exists(home_path):
-                self.args.auth = home_path
-
-        if not self.args.secrets:
-            home_path = os.path.expanduser('~/.google_analytics_secrets.json')
-
-            if os.path.exists('client_secrets.json'):
-                self.args.secrets = 'client_secrets.json'
-            elif os.path.exists(home_path):
-                self.args.secrets = home_path
-
-        self._install_exception_handler()
-
-        self.service = self._authorize()
+        self.args.func()
 
     def _install_exception_handler(self):
         """
@@ -143,31 +134,6 @@ class Clan(object):
                 sys.stderr.write('%s\n' % unicode(value).encode('utf-8'))
 
         sys.excepthook = handler
-
-    def _authorize(self):
-        """
-        Authorize with OAuth2.
-        """
-        if self.args.auth:
-            storage = Storage(self.args.auth)
-            credentials = storage.get()
-        else:
-            if not self.args.secrets:
-                raise Exception('Could not locate either analytics.dat or client_secrets.json. At least one must be provided.')
-        
-        if not self.args.auth or not credentials or credentials.invalid:
-            storage = Storage('analytics.dat')
-            
-            flow = client.flow_from_clientsecrets(
-                self.args.secrets,
-                scope='https://www.googleapis.com/auth/analytics.readonly'
-            )
-            
-            credentials = tools.run_flow(flow, storage, self.args)
-            
-        http = credentials.authorize(http=httplib2.Http())
-    
-        return discovery.build('analytics', 'v3', http=http)
 
     def _ndays(self, start_date, ndays):
         """
@@ -388,9 +354,51 @@ class Clan(object):
 
             f.write('\n')
 
-    def main(self):
-        if not self.args.output:
-            return
+    def command_auth(self):
+        """
+        Authorize with Google Analytics.
+        """
+        if not self.args.secrets:
+            home_path = os.path.expanduser('~/.clan_secrets.json')
+
+            if os.path.exists('client_secrets.json'):
+                self.args.secrets = 'client_secrets.json'
+            elif os.path.exists(home_path):
+                self.args.secrets = home_path
+            else:
+                raise Exception('Could not locate authentication secrets (client_secrets.jsonn). Please create it or specify a different file using --secrets.')
+
+        storage = Storage('analytics.dat')
+        
+        flow = client.flow_from_clientsecrets(
+            self.args.secrets,
+            scope='https://www.googleapis.com/auth/analytics.readonly'
+        )
+        
+        tools.run_flow(flow, storage, self.args)
+
+    def command_report(self):
+        """
+        Report out data.
+        """
+        if not self.args.auth:
+            home_path = os.path.expanduser('~/.clan_auth.dat')
+
+            if os.path.exists('analytics.dat'):
+                self.args.auth = 'analytics.dat'
+            elif os.path.exists(home_path):
+                self.args.auth = home_path
+            else:
+                raise Exception('Could not locate local authorization token (analytics.dat). Please specify it using --auth or run "clan auth".')
+
+        storage = Storage(self.args.auth)
+        credentials = storage.get()
+
+        if not credentials or credentials.invalid:
+            raise Exception('Invalid authentication. Please run "clan auth" to generate a new token.')
+
+        http = credentials.authorize(http=httplib2.Http())
+        self.service = discovery.build('analytics', 'v3', http=http)
 
         if self.args.data_path:
             with open(self.args.data_path) as f:
@@ -400,7 +408,7 @@ class Clan(object):
                 self.config = yaml.load(f)
 
             if 'property-id' not in self.config:
-                raise Exception('Property ID is required.')
+                raise Exception('You must specify a property-id either in your YAML file or using the --property-id argument.')
 
             data = self.report()
 
@@ -411,8 +419,7 @@ class Clan(object):
                 json.dump(data, f, indent=4)
 
 def _main():
-    clan = Clan()
-    clan.main()
+    Clan()
     
 if __name__ == "__main__":
     _main()
