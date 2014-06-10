@@ -76,7 +76,6 @@ class DiffCommand(object):
             help='Output file path.'
         )
 
-
         return parser
 
     def diff(self, report_a, report_b):
@@ -93,7 +92,22 @@ class DiffCommand(object):
         for query_a in report_a['queries']:
             for query_b in report_b['queries']:
                 if query_a['config'] == query_b['config']:
-                    print 'Match: %s' % query_a['config']['name']
+                    diff = OrderedDict()
+
+                    diff['config'] = query_a['config']
+                    diff['data_types'] = query_a['data_types']
+                    diff['data'] = OrderedDict()
+
+                    for metric, values in query_a['data'].items():
+                        diff['data'][metric] = OrderedDict()
+
+                        for label, value in values.items():
+                            diff['data'][metric][label] = OrderedDict([
+                                ('a', value),
+                                ('b', query_b['data'][metric][label])
+                            ])
+
+                    output['queries'].append(diff)
 
             query_b = report_b['queries']
 
