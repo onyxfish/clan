@@ -120,6 +120,40 @@ class Clan(object):
             help='Output file path.'
         )
         
+        # Diff
+        parser_report = subparsers.add_parser('diff', parents=[generic_parser])
+        parser_report.set_defaults(func=self.command_diff)
+
+        parser_report.add_argument(
+            '-d', '--data',
+            dest='data_path', action='store', default=None,
+            help='Path to a existing JSON diff file.'
+        )
+
+        parser_report.add_argument(
+            '-f', '--format',
+            dest='format', action='store', default='txt', choices=['txt', 'json'],
+            help='Output format.'
+        )
+
+        parser_report.add_argument(
+           'report_a',
+            action='store',
+            help='First JSON report file path.'
+        )
+
+        parser_report.add_argument(
+           'report_b',
+            action='store',
+            help='Second JSON report file path.'
+        )
+
+        parser_report.add_argument(
+            'output',
+            action='store',
+            help='Output file path.'
+        )
+
         self.args = self.argparser.parse_args()
         self.args.func()
 
@@ -355,6 +389,18 @@ class Clan(object):
 
             f.write('\n')
 
+    def diff(self, report_a, report_b):
+        """
+        Generate a diff for two data reports.
+        """
+        return []
+
+    def txt_diff(self, diff):
+        """
+        Generate a text report for a diff.
+        """
+        pass
+
     def command_auth(self):
         """
         Authorize with Google Analytics.
@@ -403,7 +449,7 @@ class Clan(object):
 
         if self.args.data_path:
             with open(self.args.data_path) as f:
-                data = json.load(f, object_pairs_hook=OrderedDict)
+                report = json.load(f, object_pairs_hook=OrderedDict)
         else:
             with open(self.args.config_path) as f:
                 self.config = yaml.load(f)
@@ -411,13 +457,35 @@ class Clan(object):
             if 'property-id' not in self.config:
                 raise Exception('You must specify a property-id either in your YAML file or using the --property-id argument.')
 
-            data = self.report()
+            report = self.report()
 
         with open(self.args.output, 'w') as f:
             if self.args.format == 'txt':
-                self.txt(data, f)
+                self.txt(report, f)
             elif self.args.format == 'json':
-                json.dump(data, f, indent=4)
+                json.dump(report, f, indent=4)
+
+    def command_diff(self):
+        """
+        Compare two data files and generate a report of their differences.
+        """
+        if self.args.data_path:
+            with open(self.args.data_path) as f:
+                diff = json.load(f, object_pairs_hook=OrderedDict)
+        else:
+            with open(self.args.report_a) as f:
+                report_a = json.load(f)
+
+            with open(self.args.report_b) as f:
+                report_b = json.load(f)
+
+            diff = self.diff(report_a, report_b)
+
+        with open(self.args.output, 'w') as f:
+            if self.args.format == 'txt':
+                self.txt_diff(diff, f)
+            elif self.args.format == 'json':
+                json.dump(diff, f, indent=4)
 
 def _main():
     Clan()
