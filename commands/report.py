@@ -311,7 +311,7 @@ class ReportCommand(object):
 
                 for label, value in data.items():
                     if data_type == 'INTEGER':
-                        pct = format_percent(value, total) if total > 0 else '0.0%' 
+                        pct = format_percent(value, total) if total > 0 else '-' 
                         value = format_comma(value)
                     elif data_type == 'TIME':
                         pct = '-'

@@ -192,46 +192,53 @@ This will write a report documenting the absolute and percentage point differenc
         start-date: 2014-06-01
         ndays: 2
         prefix: /tshirt/
+
     Totals
 
         ga:sessions
-            -12,280       0.0    total
+            -12,280    -91.8%         -    total
 
         ga:pageviews
-            -39,514       0.0    total
+            -39,514    -96.3%         -    total
 
         ga:users
-            -10,441       0.0    total
+            -10,441    -91.9%         -    total
 
         ga:uniquePageviews
-            -27,327       0.0    total
+            -27,327    -96.2%         -    total
 
 
     Totals by device category
 
         ga:sessions
-             -3,832     -17.3    mobile
-            -12,280       0.0    total
-             -1,470      -1.5    tablet
-             -6,978      18.8    desktop
+             -3,832    -96.6%     -17.3    mobile
+            -12,280    -91.8%         -    total
+             -1,470    -92.9%      -1.5    tablet
+             -6,978    -89.2%      18.8    desktop
 
         ga:pageviews
-             -7,548      -7.5    mobile
-            -39,514       0.0    total
-             -4,608      -2.8    tablet
-            -27,358      10.3    desktop
+             -7,548    -97.8%      -7.5    mobile
+            -39,514    -96.3%         -    total
+             -4,608    -97.2%      -2.8    tablet
+            -27,358    -95.8%      10.3    desktop
 
         ga:users
-             -3,321     -19.4    mobile
-            -10,441       0.0    total
-             -1,204      -1.4    tablet
-             -5,916      20.8    desktop
+             -3,321    -97.1%     -19.4    mobile
+            -10,441    -91.9%         -    total
+             -1,204    -92.9%      -1.4    tablet
+             -5,916    -89.0%      20.8    desktop
 
         ga:uniquePageviews
-             -6,025      -9.1    mobile
-            -27,327       0.0    total
-             -3,589      -2.7    tablet
-            -17,713      11.8    desktop
+             -6,025    -97.8%      -9.1    mobile
+            -27,327    -96.2%         -    total
+             -3,589    -97.0%      -2.7    tablet
+            -17,713    -95.5%      11.8    desktop
+
+The values in the report columns are:
+
+* Absolute difference
+* Percent change
+* Change in percentage points
 
 Generating a JSON diff
 ----------------------

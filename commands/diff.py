@@ -135,6 +135,8 @@ class DiffCommand(object):
             if diff['b'].get(var, None):
                 f.write('    %s: %s\n' % (var , diff['b'][var]))
 
+        f.write('\n')
+
         for analytic in diff['queries']:
             f.write('%s\n' % analytic['config']['name'])
 
@@ -152,23 +154,30 @@ class DiffCommand(object):
                     change = b - a 
 
                     if data_type == 'INTEGER':
-                        pct_a = float(a) / data['total']['a'] if data['total']['a'] > 0 else 0.0 
-                        pct_b = float(b) / data['total']['b'] if data['total']['b'] > 0 else 0.0
+                        pct_a = float(a) / data['total']['a'] if data['total']['a'] > 0 else None 
+                        pct_b = float(b) / data['total']['b'] if data['total']['b'] > 0 else None
 
-                        pct = '{:.1f}'.format((pct_b - pct_a) * 100)
+                        pct = '{:.1%}'.format(float(change) / a) if a > 0 else '-'
+
+                        if label == 'total' or pct_a is None or pct_b is None:
+                            pts = '-'
+                        else:
+                            pts = '{:.1f}'.format((pct_b - pct_a) * 100)
 
                         value = format_comma(change)
                     elif data_type == 'TIME':
-                        pct = '-'
+                        pct = '{:.1%}'.format(float(change) / a) if a > 0 else '-' 
+                        pts = '-'
                         value = format_duration(change)
                     elif data_type in ['FLOAT', 'CURRENCY', 'PERCENT']:
-                        pct = '-'
+                        pct = '{:.1%}'.format(float(change) / a) if a > 0 else '-' 
+                        pts = '-'
                         value = '%.1f' % change 
 
                     if change > 0:
                         value = '+%s' % value 
 
-                    f.write('{:>15s}    {:>6s}    {:s}\n'.format(value, pct, label))
+                    f.write('{:>15s}    {:>6s}    {:>6s}    {:s}\n'.format(value, pct, pts, label))
 
                 f.write('\n')
 
