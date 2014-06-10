@@ -2,8 +2,8 @@
 Configuration
 =============
 
-Configuring clan
-================
+Configuring with YAML
+=====================
 
 clan is configured using either YAML, command-line arguments or both.
 
@@ -64,8 +64,8 @@ prefix
 
 If specified, results will be limited to URLs with this prefix.
 
-Query configuration
-===================
+Per-query configuration
+=======================
 
 Individual queries support the following properties.
 
