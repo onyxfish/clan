@@ -15,6 +15,15 @@ from oauth2client.file import Storage
 from oauth2client import tools
 import yaml
 
+GLOBAL_ARGUMENTS = [
+    'property-id',
+    'start-date',
+    'end-date',
+    'ndays',
+    'domain',
+    'prefix',
+] 
+
 class Clan(object):
     """
     Command-line interface to Google Analytics.
@@ -80,19 +89,19 @@ class Clan(object):
 
         parser_report.add_argument(
             '--property-id',
-            dest='property_id', action='store',
+            dest='property-id', action='store',
             help='Google Analytics ID of the property to query.'
         )
 
         parser_report.add_argument(
             '--start-date',
-            dest='start_date', action='store',
+            dest='start-date', action='store',
             help='Start date for the query in YYYY-MM-DD format.'
         )
 
         parser_report.add_argument(
             '--end-date',
-            dest='end_date', action='store',
+            dest='end-date', action='store',
             help='End date for the query in YYYY-MM-DD format. Supersedes --ndays.'
         )
 
@@ -173,7 +182,7 @@ class Clan(object):
         """
         Compute an end date given a start date and a number of days.
         """
-        if not self.args.start_date and not self.config.get('start-date', None):
+        if not getattr(self.args, 'start-date') and not self.config.get('start-date', None):
             raise Exception('start-date must be provided when ndays is used.')
 
         d = date(*map(int, start_date.split('-')))
@@ -187,8 +196,8 @@ class Clan(object):
         """
         if start_date:
             start_date = start_date
-        elif self.args.start_date:
-            start_date = self.args.start_date
+        elif getattr(self.args, 'start-date'):
+            start_date = getattr(self.args, 'start-date')
         elif self.config.get('start-date', None):
             start_date = self.config['start-date']
         else:
@@ -196,8 +205,8 @@ class Clan(object):
 
         if end_date:
             end_date = end_date
-        elif self.args.end_date:
-            end_date = self.args.end_date
+        elif getattr(self.args, 'end-date'):
+            end_date = getattr(self.args, 'end-date')
         elif self.config.get('end-date', None):
             end_date = self.config['end-date']
         elif ndays:
@@ -255,15 +264,12 @@ class Clan(object):
         """
         Query analytics and stash data in a format suitable for serializing.
         """
-        output = {
-            'property-id': self.args.property_id or self.config['property-id'],
-            'start-date': self.args.start_date or self.config.get('start-date', None),
-            'end-date': self.args.end_date or self.config.get('end-date', None),
-            'ndays': self.args.ndays or self.config.get('ndays', None),
-            'domain': self.args.domain or self.config.get('domain', None),
-            'prefix': self.args.prefix or self.config.get('prefix', None),
-            'queries': [] 
-        }
+        output = OrderedDict()
+
+        for arg in GLOBAL_ARGUMENTS:
+            output[arg] = getattr(self.args, arg) or self.config.get(arg, None)
+
+        output['queries'] = []
 
         for analytic in self.config.get('queries', []):
             print 'Querying "%s"' % analytic['name']
@@ -352,7 +358,7 @@ class Clan(object):
         """
         f.write('Report run %s with:\n' % datetime.now().strftime('%Y-%m-%m'))
     
-        for var in ['property-id', 'start-date', 'end-date', 'ndays', 'domain', 'prefix']:
+        for var in GLOBAL_ARGUMENTS:
             if report.get(var, None):
                 f.write('    %s: %s\n' % (var , report[var]))
 
@@ -393,7 +399,14 @@ class Clan(object):
         """
         Generate a diff for two data reports.
         """
-        return []
+
+        output = OrderedDict([
+            ('a', OrderedDict([(arg, report_a[arg]) for arg in GLOBAL_ARGUMENTS])),
+            ('b', OrderedDict([(arg, report_b[arg]) for arg in GLOBAL_ARGUMENTS])),
+            ('queries', [])
+        ])
+
+        return output 
 
     def txt_diff(self, diff):
         """
