@@ -285,14 +285,14 @@ class Clan(object):
             
             dimensions_len = len(analytic.get('dimensions', []))
 
-            data = {
-                'config': analytic,
-                'sampled': results.get('containsSampledData', False),
-                'sampleSize': int(results.get('sampleSize', 0)),
-                'sampleSpace': int(results.get('sampleSpace', 0)),
-                'data_types': OrderedDict(),
-                'data': OrderedDict()
-            }
+            data = OrderedDict([ 
+                ('config', analytic),
+                ('sampled', results.get('containsSampledData', False)),
+                ('sampleSize', int(results.get('sampleSize', 0))),
+                ('sampleSpace', int(results.get('sampleSpace', 0))),
+                ('data_types', OrderedDict()),
+                ('data', OrderedDict())
+            ])
                     
             for column in results['columnHeaders'][dimensions_len:]:
                 data['data_types'][column['name']] = column['dataType']
@@ -405,6 +405,13 @@ class Clan(object):
             ('b', OrderedDict([(arg, report_b[arg]) for arg in GLOBAL_ARGUMENTS])),
             ('queries', [])
         ])
+
+        for query_a in report_a['queries']:
+            for query_b in report_b['queries']:
+                if query_a['config'] == query_b['config']:
+                    print 'match'
+
+            query_b = report_b['queries']
 
         return output 
 
