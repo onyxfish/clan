@@ -30,9 +30,9 @@ Global configuration
 
 The following is a list of properties that may be specified in as global configuration. Note that these may also be specified using command line arguments. Some properties can also be specified on a per-query basis. If there is a disagreement, the values will be preferred in the following order:
 
-* Command-line values
-* Query configuration in YAML
-* Global configuration in YAML
+1. Command-line values
+2. Query configuration in YAML
+#. Global configuration in YAML
 
 property-id
 -----------
