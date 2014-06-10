@@ -9,7 +9,7 @@ clan is configured using either YAML, command-line arguments or both.
 
 By default clan will look for a YAML file called :code:`clan.yml`. This can be configured using the :code:`-c` command line flag. The basic structure of this file is:
 
-.. code-block: yaml
+.. code-block:: yaml
 
     # Global configuration
     property-id: "53470309"
