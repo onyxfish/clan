@@ -2,7 +2,7 @@
 
 import argparse
 from collections import OrderedDict
-from datetime import datetime
+from datetime import date, datetime, timedelta
 import httplib2
 import json
 import os
@@ -82,7 +82,13 @@ class Clan(object):
         self.argparser.add_argument(
             '--end-date',
             dest='end_date', action='store',
-            help='End date for the query in YYYY-MM-DD format.'
+            help='End date for the query in YYYY-MM-DD format. Supersedes --ndays.'
+        )
+
+        self.argparser.add_argument(
+            '--ndays',
+            dest='ndays', action='store', type=int,
+            help='The number of days from the start-date to query. Requires start-date. Superseded by end-date.'
         )
 
         self.argparser.add_argument(
@@ -163,7 +169,18 @@ class Clan(object):
     
         return discovery.build('analytics', 'v3', http=http)
 
-    def query(self, start_date=None, end_date=None, metrics=[], dimensions=[], filters=None, sort=[], start_index=1, max_results=10):
+    def _ndays(self, start_date, ndays):
+        """
+        Compute an end date given a start date and a number of days.
+        """
+        if not self.args.start_date and not self.config.get('start-date', None):
+            raise Exception('start-date must be provided when ndays is used.')
+
+        d = date(*map(int, start_date.split('-')))
+        d += timedelta(days=ndays)
+        return d.strftime('%Y-%m-%d')
+
+    def query(self, start_date=None, end_date=None, ndays=None, metrics=[], dimensions=[], filters=None, sort=[], start_index=1, max_results=10):
         """
         Execute a query.
         """
@@ -182,6 +199,12 @@ class Clan(object):
             end_date = self.args.end_date
         elif self.config.get('end-date', None):
             end_date = self.config['end-date']
+        elif ndays:
+            end_date = self._ndays(start_date, ndays)
+        elif self.args.ndays:
+            end_date = self._ndays(start_date, self.args.ndays)
+        elif self.config.get('ndays', None):
+            end_date = self._ndays(start_date, self.config['ndays'])
         else:
             end_date = 'today' 
 
@@ -235,6 +258,7 @@ class Clan(object):
             'property-id': self.args.property_id or self.config['property-id'],
             'start-date': self.args.start_date or self.config.get('start-date', None),
             'end-date': self.args.end_date or self.config.get('end-date', None),
+            'ndays': self.args.ndays or self.config.get('ndays', None),
             'domain': self.args.domain or self.config.get('domain', None),
             'prefix': self.args.prefix or self.config.get('prefix', None),
             'queries': [] 
@@ -327,7 +351,7 @@ class Clan(object):
         """
         f.write('Report run %s with:\n' % datetime.now().strftime('%Y-%m-%m'))
     
-        for var in ['property-id', 'start-date', 'end-date', 'domain', 'prefix']:
+        for var in ['property-id', 'start-date', 'end-date', 'ndays', 'domain', 'prefix']:
             if report.get(var, None):
                 f.write('    %s: %s\n' % (var , report[var]))
 

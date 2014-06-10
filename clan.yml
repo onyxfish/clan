@@ -4,6 +4,7 @@ start-date: "2014-06-01"
 #end-date: "2014-06-04"
 #domain: "apps.npr.org"
 prefix: "/commencement/"
+ndays: 2    
 
 # Metrics
 queries:
