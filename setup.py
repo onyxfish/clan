@@ -38,6 +38,7 @@ setup(
         'Topic :: Utilities'
     ],
     packages=[
+        'commands'
     ],
     entry_points ={
         'console_scripts': [
