@@ -1,5 +1,21 @@
 <html>
     <head>
+        <style>
+            dt { font-weight: bold; }
+
+            .query { margin-left: 40px; }
+            .metric { margin-left: 40px; }
+            table { margin-left: 40px; }
+
+            th,td { padding-left: 10px; padding-right: 10px; }
+            .value { text-align: right }
+            .percent { text-align: right }
+            .points { text-align: right }
+            .label { text-align: left; }
+
+            .positive { color: green; }
+            .negative { color: red; }
+        </style>
     </head>
     <body>
 
@@ -24,47 +40,54 @@
 
         <h2>Results</h2>
 
-        {% for query in diff['queries'] %}
+        {% for query in diff.queries %}
+        <div class="query">
             <h3>{{ query.config.name }}</h3>
 
             {% for metric, data in query.data.items() %}
+            <div class="metric">
                 <h4>{{ metric }}</h4>
+            
+                {% set data_type = query.data_types[metric] %}
 
                 <table>
                     <tr>
-                        <th>Value change</th>
-                        <th>Percent change</th>
-                        <th>Percentage point change</th>
-                        <th>Label</th>
+                        <th class="value">Value change</th>
+                        <th class="percent">Percent change</th>
+                        <th class="points">Percentage point change</th>
+                        <th class="label">Label</th>
                     </tr>
                     {% for label, values in data.items() %}
                     <tr>
+                        {% set nc = number_class(values.change) %}
                         {% if data_type == 'INTEGER' %}
-                            <th>{{ format_comma(values.change) }}</th>
+                            <td class="value {{ nc }}">{{ format_comma(values.change) }}</td>
                         {% elif data_type == 'TIME' %}
-                            <th>{{ format_duration(values.change) }}</th>
+                            <td class="value {{ nc }}">{{ format_duration(values.change) }}</td>
                         {% else %}
-                            <th>{{ '{:.1f}'.format(values.change) }}</th>
+                            <td class="value {{ nc }}">{{ '{:.1f}'.format(values.change) }}</td>
                         {% endif %}
-                        <th>
+                        <td class="percent {{ number_class(values.percent_change) }}">
                             {% if values.percent_change == None %}
                             -
                             {% else %}
                             {{ '{:.1%}'.format(values.percent_change) }}
                             {% endif %}
-                        </th>
-                        <th>
+                        </td>
+                        <td class="points {{ number_class(values.point_change) }}">
                             {% if values.point_change == None %}
                             -
                             {% else %}
                             {{ '{:.1f}'.format(values.point_change * 100) }}
                             {% endif %}
-                        </th>
-                        <th>{{ label }}</th>
+                        </td>
+                        <td class="label">{{ label }}</td>
                     </tr>
                     {% endfor %}
                 </table>
+            </div>
             {% endfor %}
+        </div>
         {% endfor %}
     </body>
 </html>
