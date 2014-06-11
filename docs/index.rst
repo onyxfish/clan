@@ -24,6 +24,7 @@ Usage
 
     basics
     configuration
+    queries
 
 Authors
 =======
