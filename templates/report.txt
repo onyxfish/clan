@@ -17,22 +17,21 @@ Using {{ query.sampleSize / query.sampleSpace * 100 }}% of data as a sample.
 
     {% for label, value in data.items() %}
         {% set data_type = query.data_types[metric] %}
-        {% set total = data.total %}
         {% if data_type == 'INTEGER' %}
-            {% set a = format_comma(value) %}
-            {% if total > 0 %}
-                {% set b = format_percent(value, total) %}
+            {% set number = format_comma(value) %}
+            {% if data.total > 0 %}
+                {% set pct = format_percent(value, data.total) %}
             {% else %}
-                {% set b = '-' %}
+                {% set pct = '-' %}
             {% endif %}
         {% elif data_type == 'TIME' %}
-            {% set a = format_duration(value) %} 
-            {% set b = '-' %}
+            {% set number = format_duration(value) %} 
+            {% set pct = '-' %}
         {% else %}
-            {% set a = '{:.1f}'.format(value) %}
-            {% set b = '-' %}
+            {% set number = '{:.1f}'.format(value) %}
+            {% set pct = '-' %}
         {% endif %}
-    {{ format_row(a, b, label) -}}
+    {{ format_row(number, pct, label) -}}
     {% endfor %}
 
 {% endfor %}
