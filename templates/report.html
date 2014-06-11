@@ -1,0 +1,63 @@
+<html>
+    <head>
+    </head>
+    <body>
+
+    </body>
+        <h1>clan report for {{ report.run_date }}</h1>
+
+        <h2>Configuration</h2>
+
+        <dl>
+            {% for arg in GLOBAL_ARGUMENTS %} 
+            <dt>{{ arg }}</dt><dd>{{ report[arg] }}</dd>
+            {% endfor %}
+        </dl>
+
+        <h2>Results</h2>
+
+        {% for query in report['queries'] %}
+            <h3>{{ query.config.name }}</h3>
+
+            {% if query.sampled %}
+            <p>Using {{ query.sampleSize / query.sampleSpace * 100 }}% of data as a sample.</p>
+            {% endif %}
+
+            {% for metric, data in query.data.items() %}
+                <h4>{{ metric }}</h4>
+
+                <table>
+                    <tr>
+                        <th>Value</th>
+                        <th>Percent of total</th>
+                        <th>Label</th>
+                    </tr>
+                    {% for label, value in data.items() %}
+                    <tr>
+                        {% set data_type = query.data_types[metric] %}
+                        {% set total = data.total %}
+
+                        {% if data_type == 'INTEGER' %}
+                        <th>{{ format_comma(value) }}</th>
+                        <th>
+                            {% if total > 0 %}
+                            {{ format_percent(value, total) }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </th>
+                        {% elif data_type == 'TIME' %}
+                        <th>{{ format_duration(value) }}</th>
+                        <th>-</th>
+                        {% else %}
+                        <th>{{ '{:.1f}'.format(value) }}</th>
+                        <th>-</th>
+                        {% endif %}
+                        <th>{{ label }}</th>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% endfor %}
+        {% endfor %}
+    </body>
+</html>

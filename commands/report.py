@@ -9,6 +9,7 @@ import yaml
 
 from apiclient import discovery
 import httplib2
+from jinja2 import Environment, PackageLoader
 from oauth2client.file import Storage
 
 from commands.utils import GLOBAL_ARGUMENTS, format_comma, format_duration, format_percent
@@ -56,6 +57,8 @@ class ReportCommand(object):
         with open(self.args.output, 'w') as f:
             if self.args.format == 'txt':
                 self.txt(report, f)
+            elif self.args.format == 'html':
+                self.html(report, f)
             elif self.args.format == 'json':
                 json.dump(report, f, indent=4)
 
@@ -86,7 +89,7 @@ class ReportCommand(object):
 
         parser.add_argument(
             '-f', '--format',
-            dest='format', action='store', default='txt', choices=['txt', 'json'],
+            dest='format', action='store', default='txt', choices=['txt', 'json', 'html'],
             help='Output format.'
         )
 
@@ -325,4 +328,24 @@ class ReportCommand(object):
                 f.write('\n')
 
             f.write('\n')
+
+    def html(self, report, f):
+        """
+        Write report data to an HTML file.
+        """
+        env = Environment(loader=PackageLoader('clan', 'templates'))
+
+        template = env.get_template('report.html')
+
+        context = {
+            'report': report,
+            'GLOBAL_ARGUMENTS': GLOBAL_ARGUMENTS,
+            'format_comma': format_comma,
+            'format_duration': format_duration,
+            'format_percent': format_percent
+        }
+
+        with open(self.args.output, 'w') as f:
+            f.write(template.render(**context))
+
 
