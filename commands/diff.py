@@ -31,7 +31,9 @@ class DiffCommand(object):
 
         with open(self.args.output, 'w') as f:
             if self.args.format == 'txt':
-                self.txt_diff(diff, f)
+                self.txt(diff, f)
+            elif self.args.format == 'html':
+                self.html(diff, f)
             elif self.args.format == 'json':
                 json.dump(diff, f, indent=4)
 
@@ -56,7 +58,7 @@ class DiffCommand(object):
 
         parser.add_argument(
             '-f', '--format',
-            dest='format', action='store', default='txt', choices=['txt', 'json'],
+            dest='format', action='store', default='txt', choices=['txt', 'json', 'html'],
             help='Output format.'
         )
 
@@ -119,7 +121,7 @@ class DiffCommand(object):
 
         return output 
 
-    def txt_diff(self, diff, f):
+    def txt(self, diff, f):
         """
         Generate a text report for a diff.
         """
@@ -172,6 +174,23 @@ class DiffCommand(object):
             'format_row': format_row
         }
 
-        with open(self.args.output, 'w') as f:
-            f.write(template.render(**context))
+        f.write(template.render(**context))
+
+    def html(self, diff, f):
+        """
+        Generate a text report for a diff.
+        """
+        env = Environment(loader=PackageLoader('clan', 'templates'))
+
+        template = env.get_template('diff.html')
+
+        context = {
+            'diff': diff,
+            'GLOBAL_ARGUMENTS': GLOBAL_ARGUMENTS,
+            'format_comma': format_comma,
+            'format_duration': format_duration,
+            'format_percent': format_percent
+        }
+
+        f.write(template.render(**context))
 
