@@ -1,0 +1,26 @@
+clan diff
+
+Report A run {{ diff.a.run_date }}:
+{% for arg in GLOBAL_ARGUMENTS %}    {{ arg }}: {{ diff.a[arg] }}
+{% endfor %}
+
+Report B run {{ diff.b.run_date }}:
+{% for arg in GLOBAL_ARGUMENTS %}    {{ arg }}: {{ diff.b[arg] }}
+{% endfor %}
+
+Results
+
+{% for query in diff['queries'] %}
+{{ query.config.name }}
+
+{% for metric, data in query.data.items() %}
+    {{ metric }}
+
+    {% for label, values in data.items() %}
+        {% set totals = data.total %}
+        {% set data_type = query.data_types[metric] %}
+        {{ format_row(label, values, totals, data_type) -}}
+    {% endfor %}
+
+{% endfor %}
+{% endfor %}
