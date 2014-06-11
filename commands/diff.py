@@ -161,6 +161,15 @@ class DiffCommand(object):
             percent_change = '{:.1%}'.format(values['percent_change']) if values['percent_change'] is not None else '-'
             point_change = '{:.1f}'.format(values['point_change']) if values['point_change'] is not None else '-'
 
+            if values['change'] > 0:
+                change = '+%s' % change
+
+            if values['percent_change'] is not None and values['percent_change'] > 0:
+                percent_change = '+%s' % percent_change
+
+            if values['point_change'] is not None and values['point_change'] > 0:
+                point_change = '+%s' % point_change
+
             return '{:>15s}    {:>8s}    {:>8s}    {:s}\n'.format(change, percent_change, point_change, label)
 
         context = {
