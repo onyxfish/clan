@@ -17,9 +17,7 @@ Results
     {{ metric }}
 
     {% for label, values in data.items() %}
-        {% set totals = data.total %}
-        {% set data_type = query.data_types[metric] %}
-        {{ format_row(label, values, totals, data_type) -}}
+        {{ format_row(label, values) -}}
     {% endfor %}
 
 {% endfor %}

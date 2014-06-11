@@ -109,10 +109,28 @@ class DiffCommand(object):
                     for metric, values in query_a['data'].items():
                         diff['data'][metric] = OrderedDict()
 
+                        total_a = values['total']
+                        total_b = query_b['data'][metric]['total']
+
                         for label, value in values.items():
+                            a = value
+                            b = query_b['data'][metric][label]
+
+                            change = b - a
+                            percent_change = float(change) / a if a > 0 else None
+                            
+                            percent_a = float(a) / total_a if total_a > 0 else None
+                            percent_b = float(b) / total_b if total_b > 0 else None
+
+                            if label == 'total' or percent_a is None or percent_b is None:
+                                point_change = None
+                            else:
+                                point_change = percent_b - percent_a
+
                             diff['data'][metric][label] = OrderedDict([
-                                ('a', value),
-                                ('b', query_b['data'][metric][label])
+                                ('change', change),
+                                ('percent_change', percent_change),
+                                ('point_change', point_change),
                             ])
 
                     output['queries'].append(diff)
@@ -133,37 +151,12 @@ class DiffCommand(object):
 
         template = env.get_template('diff.txt')
 
-        def format_row(label, values, totals, data_type):
-            a = values['a']
-            b = values['b']
+        def format_row(label, values):
+            change = format_comma(values['change'])
+            percent_change = '{:.1%}'.format(values['percent_change']) if values['percent_change'] is not None else '-'
+            point_change = '{:.1f}'.format(values['point_change']) if values['point_change'] is not None else '-'
 
-            change = b - a 
-
-            if data_type == 'INTEGER':
-                pct_a = float(a) / totals['a'] if totals['a'] > 0 else None 
-                pct_b = float(b) / totals['b'] if totals['b'] > 0 else None
-
-                pct = '{:.1%}'.format(float(change) / a) if a > 0 else '-'
-
-                if label == 'total' or pct_a is None or pct_b is None:
-                    pts = '-'
-                else:
-                    pts = '{:.1f}'.format((pct_b - pct_a) * 100)
-
-                value = format_comma(change)
-            elif data_type == 'TIME':
-                pct = '{:.1%}'.format(float(change) / a) if a > 0 else '-' 
-                pts = '-'
-                value = format_duration(change)
-            elif data_type in ['FLOAT', 'CURRENCY', 'PERCENT']:
-                pct = '{:.1%}'.format(float(change) / a) if a > 0 else '-' 
-                pts = '-'
-                value = '%.1f' % change 
-
-            if change > 0:
-                value = '+%s' % value 
-
-            return '{:>15s}    {:>6s}    {:>6s}    {:s}\n'.format(value, pct, pts, label)
+            return '{:>15s}    {:>6s}    {:>6s}    {:s}\n'.format(change, percent_change, point_change, label)
 
         context = {
             'diff': diff,

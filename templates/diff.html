@@ -39,62 +39,28 @@
                     </tr>
                     {% for label, values in data.items() %}
                     <tr>
-                        {% set a = values.a %}
-                        {% set b = values.b %}
-                        {% set change = b - a %}
-                        {% set data_type = query.data_types[metric] %}
-                        {% set totals = data.total %}
-
                         {% if data_type == 'INTEGER' %}
-                            {% if totals.a == 0 %}
-                                {% set pct_a = None %}
-                            {% else %}
-                                {% set pct_a = a / totals.a %}
-                            {% endif %}
-
-                            {% if totals.b == 0 %}
-                                {% set pct_b = 0 %}
-                            {% else %}
-                                {% set pct_b = b / totals.b %}
-                            {% endif %} 
-
-                            <th>{{ format_comma(change) }}</th>
-                            <th>
-                                {% if a == 0 %}
-                                    -
-                                {% else %}
-                                    {{ format_percent(change, a) }}
-                                {% endif %}
-                            </th>
-                            <th>
-                                {% if label == 'total' or pct_a == None or pct_b == None %}
-                                    -
-                                {% else %}
-                                {{ '{:.1f}'.format((pct_b - pct_a) * 100) }}
-                                {% endif %}
-                            </th>
+                            <th>{{ format_comma(values.change) }}</th>
                         {% elif data_type == 'TIME' %}
-                            <th>{{ format_duration(change) }}</th>
-                            <th>
-                                {% if a == 0 %}
-                                    -
-                                {% else %}
-                                    {{ format_percent(change, a) }}
-                                {% endif %}
-                            </th>
-                            <th>-</th>
+                            <th>{{ format_duration(values.change) }}</th>
                         {% else %}
-                            <th>{{ '{:.1f}'.format(change) }}</th>
-                            <th>
-                                {% if a == 0 %}
-                                    -
-                                {% else %}
-                                    {{ format_percent(change, a) }}
-                                {% endif %}
-                            </th>
+                            <th>{{ '{:.1f}'.format(values.change) }}</th>
                             <th>-</th>
                         {% endif %}
-
+                        <th>
+                            {% if values.percent_change == None %}
+                            -
+                            {% else %}
+                            {{ '{:.1%}'.format(values.percent_change) }}
+                            {% endif %}
+                        </th>
+                        <th>
+                            {% if values.point_change == None %}
+                            -
+                            {% else %}
+                            {{ '{:.1f}'.format(values.point_change * 100) }}
+                            {% endif %}
+                        </th>
                         <th>{{ label }}</th>
                     </tr>
                     {% endfor %}
