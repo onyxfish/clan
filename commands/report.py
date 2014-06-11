@@ -297,8 +297,18 @@ class ReportCommand(object):
         )
         template = env.get_template('report.txt')
 
-        def format_row(a, b, c):
-            return '{:>15s}    {:>6s}    {:s}\n'.format(a, b, c)
+        def format_row(label, value, total, data_type):
+            if data_type == 'INTEGER':
+                pct = format_percent(value, total) if total > 0 else '-' 
+                value = format_comma(value)
+            elif data_type == 'TIME':
+                pct = '-'
+                value = format_duration(value)
+            elif data_type in ['FLOAT', 'CURRENCY', 'PERCENT']:
+                pct = '-'
+                value = '%.1f' % value
+
+            return '{:>15s}    {:>6s}    {:s}\n'.format(value, pct, label)
 
         context = {
             'report': report,

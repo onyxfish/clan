@@ -3,7 +3,9 @@
 from collections import OrderedDict
 import json
 
-from commands.utils import GLOBAL_ARGUMENTS, format_comma, format_duration
+from jinja2 import Environment, PackageLoader
+
+from commands.utils import GLOBAL_ARGUMENTS, format_comma, format_duration, format_percent
 
 class DiffCommand(object):
     def __init__(self):
@@ -121,65 +123,55 @@ class DiffCommand(object):
         """
         Generate a text report for a diff.
         """
-        f.write('Comparing report A run %s with:\n' % diff['a']['run_date'])
-    
-        for var in GLOBAL_ARGUMENTS:
-            if diff['a'].get(var, None):
-                f.write('    %s: %s\n' % (var , diff['a'][var]))
+        env = Environment(
+            loader=PackageLoader('clan', 'templates'),
+            trim_blocks=True,
+            lstrip_blocks=True
+        )
 
-        f.write('\n')
+        template = env.get_template('diff.txt')
 
-        f.write('With report B run %s with:\n' % diff['b']['run_date'])
+        def format_row(label, values, totals, data_type):
+            a = values['a']
+            b = values['b']
 
-        for var in GLOBAL_ARGUMENTS:
-            if diff['b'].get(var, None):
-                f.write('    %s: %s\n' % (var , diff['b'][var]))
+            change = b - a 
 
-        f.write('\n')
+            if data_type == 'INTEGER':
+                pct_a = float(a) / totals['a'] if totals['a'] > 0 else None 
+                pct_b = float(b) / totals['b'] if totals['b'] > 0 else None
 
-        for analytic in diff['queries']:
-            f.write('%s\n' % analytic['config']['name'])
+                pct = '{:.1%}'.format(float(change) / a) if a > 0 else '-'
 
-            f.write('\n')
+                if label == 'total' or pct_a is None or pct_b is None:
+                    pts = '-'
+                else:
+                    pts = '{:.1f}'.format((pct_b - pct_a) * 100)
 
-            for metric, data in analytic['data'].items():
-                f.write('    %s\n' % metric)
+                value = format_comma(change)
+            elif data_type == 'TIME':
+                pct = '{:.1%}'.format(float(change) / a) if a > 0 else '-' 
+                pts = '-'
+                value = format_duration(change)
+            elif data_type in ['FLOAT', 'CURRENCY', 'PERCENT']:
+                pct = '{:.1%}'.format(float(change) / a) if a > 0 else '-' 
+                pts = '-'
+                value = '%.1f' % change 
 
-                data_type = analytic['data_types'][metric]
+            if change > 0:
+                value = '+%s' % value 
 
-                for label, values in data.items():
-                    a = values['a']
-                    b = values['b']
+            return '{:>15s}    {:>6s}    {:>6s}    {:s}\n'.format(value, pct, pts, label)
 
-                    change = b - a 
+        context = {
+            'diff': diff,
+            'GLOBAL_ARGUMENTS': GLOBAL_ARGUMENTS,
+            'format_comma': format_comma,
+            'format_duration': format_duration,
+            'format_percent': format_percent,
+            'format_row': format_row
+        }
 
-                    if data_type == 'INTEGER':
-                        pct_a = float(a) / data['total']['a'] if data['total']['a'] > 0 else None 
-                        pct_b = float(b) / data['total']['b'] if data['total']['b'] > 0 else None
-
-                        pct = '{:.1%}'.format(float(change) / a) if a > 0 else '-'
-
-                        if label == 'total' or pct_a is None or pct_b is None:
-                            pts = '-'
-                        else:
-                            pts = '{:.1f}'.format((pct_b - pct_a) * 100)
-
-                        value = format_comma(change)
-                    elif data_type == 'TIME':
-                        pct = '{:.1%}'.format(float(change) / a) if a > 0 else '-' 
-                        pts = '-'
-                        value = format_duration(change)
-                    elif data_type in ['FLOAT', 'CURRENCY', 'PERCENT']:
-                        pct = '{:.1%}'.format(float(change) / a) if a > 0 else '-' 
-                        pts = '-'
-                        value = '%.1f' % change 
-
-                    if change > 0:
-                        value = '+%s' % value 
-
-                    f.write('{:>15s}    {:>6s}    {:>6s}    {:s}\n'.format(value, pct, pts, label))
-
-                f.write('\n')
-
-            f.write('\n')
+        with open(self.args.output, 'w') as f:
+            f.write(template.render(**context))
 
