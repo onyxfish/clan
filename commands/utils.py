@@ -13,7 +13,7 @@ def format_comma(d):
     """
     Format a comma separated number.
     """
-    return '{:,d}'.format(d)
+    return '{:,}'.format(d)
 
 def format_duration(secs):
     """

@@ -114,7 +114,12 @@ class DiffCommand(object):
 
                         for label, value in values.items():
                             a = value
-                            b = query_b['data'][metric][label]
+                            
+                            try:
+                                b = query_b['data'][metric][label]
+                            # TODO: hack for when labels are different...
+                            except KeyError:
+                                continue
 
                             change = b - a
                             percent_change = float(change) / a if a > 0 else None
@@ -156,7 +161,7 @@ class DiffCommand(object):
             percent_change = '{:.1%}'.format(values['percent_change']) if values['percent_change'] is not None else '-'
             point_change = '{:.1f}'.format(values['point_change']) if values['point_change'] is not None else '-'
 
-            return '{:>15s}    {:>6s}    {:>6s}    {:s}\n'.format(change, percent_change, point_change, label)
+            return '{:>15s}    {:>8s}    {:>8s}    {:s}\n'.format(change, percent_change, point_change, label)
 
         context = {
             'diff': diff,

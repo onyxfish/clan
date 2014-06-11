@@ -308,7 +308,7 @@ class ReportCommand(object):
                 pct = '-'
                 value = '%.1f' % value
 
-            return '{:>15s}    {:>6s}    {:s}\n'.format(value, pct, label)
+            return '{:>15s}    {:>8s}    {:s}\n'.format(value, pct, label)
 
         context = {
             'report': report,
