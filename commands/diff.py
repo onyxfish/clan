@@ -107,6 +107,7 @@ class DiffCommand(object):
                     diff['data'] = OrderedDict()
 
                     for metric, values in query_a['data'].items():
+                        data_type = diff['data_types'][metric]
                         diff['data'][metric] = OrderedDict()
 
                         total_a = values['total']
@@ -127,7 +128,7 @@ class DiffCommand(object):
                             percent_a = float(a) / total_a if total_a > 0 else None
                             percent_b = float(b) / total_b if total_b > 0 else None
 
-                            if label == 'total' or percent_a is None or percent_b is None:
+                            if label == 'total' or data_type == 'TIME' or percent_a is None or percent_b is None:
                                 point_change = None
                             else:
                                 point_change = percent_b - percent_a
