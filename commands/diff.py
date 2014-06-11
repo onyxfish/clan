@@ -159,7 +159,7 @@ class DiffCommand(object):
         def format_row(label, values):
             change = format_comma(values['change'])
             percent_change = '{:.1%}'.format(values['percent_change']) if values['percent_change'] is not None else '-'
-            point_change = '{:.1f}'.format(values['point_change']) if values['point_change'] is not None else '-'
+            point_change = '{:.1f}'.format(values['point_change'] * 100) if values['point_change'] is not None else '-'
 
             if values['change'] > 0:
                 change = '+%s' % change
