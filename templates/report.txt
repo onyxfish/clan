@@ -1,0 +1,39 @@
+clan report for {{ report.run_date }}
+
+Configuration
+{% for arg in GLOBAL_ARGUMENTS %}    {{ arg }}: {{ report[arg] }}
+{% endfor %}
+
+Results
+
+{% for query in report['queries'] %}
+{{ query.config.name }}
+{% if query.sampled %}
+Using {{ query.sampleSize / query.sampleSpace * 100 }}% of data as a sample.
+{% endif %}
+
+{% for metric, data in query.data.items() %}
+    {{ metric }}
+
+    {% for label, value in data.items() %}
+        {% set data_type = query.data_types[metric] %}
+        {% set total = data.total %}
+        {% if data_type == 'INTEGER' %}
+            {% set a = format_comma(value) %}
+            {% if total > 0 %}
+                {% set b = format_percent(value, total) %}
+            {% else %}
+                {% set b = '-' %}
+            {% endif %}
+        {% elif data_type == 'TIME' %}
+            {% set a = format_duration(value) %} 
+            {% set b = '-' %}
+        {% else %}
+            {% set a = '{:.1f}'.format(value) %}
+            {% set b = '-' %}
+        {% endif %}
+    {{ format_row(a, b, label) -}}
+    {% endfor %}
+
+{% endfor %}
+{% endfor %}

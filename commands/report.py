@@ -290,44 +290,27 @@ class ReportCommand(object):
         """
         Write report data to a human-readable text file.
         """
-        f.write('Report run %s with:\n' % report['run_date'])
-    
-        for var in GLOBAL_ARGUMENTS:
-            if report.get(var, None):
-                f.write('    %s: %s\n' % (var, report[var]))
+        env = Environment(
+            loader=PackageLoader('clan', 'templates'),
+            trim_blocks=True,
+            lstrip_blocks=True
+        )
+        template = env.get_template('report.txt')
 
-        f.write('\n')
+        def format_row(a, b, c):
+            return '{:>15s}    {:>6s}    {:s}\n'.format(a, b, c)
 
-        for analytic in report['queries']:
-            f.write('%s\n' % analytic['config']['name'])
+        context = {
+            'report': report,
+            'GLOBAL_ARGUMENTS': GLOBAL_ARGUMENTS,
+            'format_comma': format_comma,
+            'format_duration': format_duration,
+            'format_percent': format_percent,
+            'format_row': format_row
+        }
 
-            if analytic['sampled']:
-                f.write('(using {:.1%} of data as sample)\n'.format(float(analytic['sampleSize']) / analytic['sampleSpace']))
-                
-            f.write('\n')
-
-            for metric, data in analytic['data'].items():
-                f.write('    %s\n' % metric)
-
-                data_type = analytic['data_types'][metric]
-                total = data['total']
-
-                for label, value in data.items():
-                    if data_type == 'INTEGER':
-                        pct = format_percent(value, total) if total > 0 else '-' 
-                        value = format_comma(value)
-                    elif data_type == 'TIME':
-                        pct = '-'
-                        value = format_duration(value)
-                    elif data_type in ['FLOAT', 'CURRENCY', 'PERCENT']:
-                        pct = '-'
-                        value = '%.1f' % value
-
-                    f.write('{:>15s}    {:>6s}    {:s}\n'.format(value, pct, label))
-
-                f.write('\n')
-
-            f.write('\n')
+        with open(self.args.output, 'w') as f:
+            f.write(template.render(**context))
 
     def html(self, report, f):
         """
