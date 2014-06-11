@@ -45,7 +45,6 @@
                             <th>{{ format_duration(values.change) }}</th>
                         {% else %}
                             <th>{{ '{:.1f}'.format(values.change) }}</th>
-                            <th>-</th>
                         {% endif %}
                         <th>
                             {% if values.percent_change == None %}
