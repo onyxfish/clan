@@ -50,27 +50,26 @@
                         <td class="label">{{ label }}</td>
 
                         {% set nc = number_class(values.change) %}
-                        {% set plus = (values.change > 0) %}
                         
                         {% if data_type == 'INTEGER' %}
-                            <td class="value {{ nc }}">{% if plus %}+{% endif %}{{ format_comma(values.change) }}</td>
+                            <td class="value {{ nc }}"> {{ format_comma(values.change) }}</td>
                         {% elif data_type == 'TIME' %}
-                            <td class="value {{ nc }}">{% if plus %}+{% endif %}{{ format_duration(values.change) }}</td>
+                            <td class="value {{ nc }}"> {{ format_duration(values.change) }}</td>
                         {% else %}
-                            <td class="value {{ nc }}">{% if plus %}+{% endif %}{{ '{:.1f}'.format(values.change) }}</td>
+                            <td class="value {{ nc }}"> {{ '{:.1f}'.format(values.change) }}</td>
                         {% endif %}
                         <td class="percent {{ number_class(values.percent_change) }}">
                             {% if values.percent_change == None %}
                             -
                             {% else %}
-                            {% if plus %}+{% endif %}{{ '{:.1%}'.format(values.percent_change) }}
+                            {{ '{:.1%}'.format(values.percent_change) }}
                             {% endif %}
                         </td>
                         <td class="points {{ number_class(values.point_change) }}">
                             {% if values.point_change == None %}
                             -
                             {% else %}
-                            {% if plus %}+{% endif %}{{ '{:.1f}'.format(values.point_change * 100) }}
+                            {{ '{:.1f}'.format(values.point_change * 100) }}
                             {% endif %}
                         </td>
                     </tr>

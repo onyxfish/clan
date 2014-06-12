@@ -47,5 +47,6 @@ tr.total { background-color: #ddf; }
 
 /* Diff only */
 .positive { color: #151; }
+.positive::before { content: "+"; }
 .negative { color: #511; }
 
