@@ -9,15 +9,23 @@
 
         <h2>Configuration</h2>
 
-        <dl>
-            {% for arg in GLOBAL_ARGUMENTS %} 
-            <dt>{{ arg }}</dt><dd>{{ report[arg] }}</dd>
-            {% endfor %}
-        </dl>
+        <table>
+            <tbody>
+                {% for arg in GLOBAL_ARGUMENTS %} 
+                {% if report[arg] != None %}
+                <tr>
+                    <td>{{ arg }}</td>
+                    <td>{{ report[arg] }}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
 
         <h2>Results</h2>
 
         {% for query in report['queries'] %}
+        <div class="query">
             <h3>{{ query.config.name }}</h3>
 
             {% if query.sampled %}
@@ -25,40 +33,48 @@
             {% endif %}
 
             {% for metric, data in query.data.items() %}
+            <div class="metric">
                 <h4>{{ metric }}</h4>
 
                 <table>
-                    <tr>
-                        <th>Value</th>
-                        <th>Percent of total</th>
-                        <th>Label</th>
-                    </tr>
-                    {% for label, value in data.items() %}
-                    <tr>
-                        {% set data_type = query.data_types[metric] %}
-                        {% set total = data.total %}
+                    <thead>
+                        <tr>
+                            <th class="label">Dimension(s)</th>
+                            <th class="value">Value</th>
+                            <th class="percent">Percent of total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for label, value in data.items() %}
+                        <tr class="{% if loop.index % 2 == 0 %}even{% else %}odd{% endif %} {% if label == 'total' %}total{% endif %}">
+                            <td class="label">{{ label }}</td>
 
-                        {% if data_type == 'INTEGER' %}
-                        <th>{{ format_comma(value) }}</th>
-                        <th>
-                            {% if total > 0 %}
-                            {{ format_percent(value, total) }}
+                            {% set data_type = query.data_types[metric] %}
+                            {% set total = data.total %}
+
+                            {% if data_type == 'INTEGER' %}
+                            <td class="value">{{ format_comma(value) }}</td>
+                            <td class="percent">
+                                {% if total > 0 %}
+                                {{ format_percent(value, total) }}
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            {% elif data_type == 'TIME' %}
+                            <td class="value">{{ format_duration(value) }}</td>
+                            <td class="percent">-</td>
                             {% else %}
-                            -
+                            <td class="value">{{ '{:.1f}'.format(value) }}</td>
+                            <td class="percent">-</td>
                             {% endif %}
-                        </th>
-                        {% elif data_type == 'TIME' %}
-                        <th>{{ format_duration(value) }}</th>
-                        <th>-</th>
-                        {% else %}
-                        <th>{{ '{:.1f}'.format(value) }}</th>
-                        <th>-</th>
-                        {% endif %}
-                        <th>{{ label }}</th>
-                    </tr>
-                    {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
                 </table>
+            </div>
             {% endfor %}
+        </div>
         {% endfor %}
     </body>
 </html>

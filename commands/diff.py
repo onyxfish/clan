@@ -22,10 +22,10 @@ class DiffCommand(object):
                 diff = json.load(f, object_pairs_hook=OrderedDict)
         else:
             with open(self.args.report_a) as f:
-                report_a = json.load(f)
+                report_a = json.load(f, object_pairs_hook=OrderedDict)
 
             with open(self.args.report_b) as f:
-                report_b = json.load(f)
+                report_b = json.load(f, object_pairs_hook=OrderedDict)
 
             diff = self.diff(report_a, report_b)
 

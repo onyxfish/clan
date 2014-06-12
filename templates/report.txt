@@ -1,7 +1,10 @@
 clan report for {{ report.run_date }}
 
 Configuration
-{% for arg in GLOBAL_ARGUMENTS %}    {{ arg }}: {{ report[arg] }}
+{% for arg in GLOBAL_ARGUMENTS %}
+{% if report[arg] != None %}
+    {{ arg }}: {{ report[arg] }}
+{% endif %}
 {% endfor %}
 
 Results

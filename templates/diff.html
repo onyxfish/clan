@@ -9,21 +9,22 @@
     </body>
         <h1>clan diff</h1>
 
-        <h2>Report A run {{ diff.a.run_date }}</h2>
+        {% for report in ['a', 'b'] %}
+        <h2>Report {{ report|upper }} run {{ diff[report].run_date }}</h2>
 
-        <dl>
-            {% for arg in GLOBAL_ARGUMENTS %} 
-            <dt>{{ arg }}</dt><dd>{{ diff.a[arg] }}</dd>
-            {% endfor %}
-        </dl>
-
-        <h2>Report B run {{ diff.b.run_date }}</h2>
-
-        <dl>
-            {% for arg in GLOBAL_ARGUMENTS %} 
-            <dt>{{ arg }}</dt><dd>{{ diff.b[arg] }}</dd>
-            {% endfor %}
-        </dl>
+        <table>
+            <tbody>
+                {% for arg in GLOBAL_ARGUMENTS %} 
+                {% if diff[report][arg] != None %}
+                <tr>
+                    <td>{{ arg }}</td>
+                    <td>{{ diff[report][arg] }}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endfor %}
 
         <h2>Results</h2>
 
@@ -39,36 +40,39 @@
 
                 <table>
                     <tr>
+                        <th class="label">Label</th>
                         <th class="value">Value change</th>
                         <th class="percent">Percent change</th>
                         <th class="points">Percentage point change</th>
-                        <th class="label">Label</th>
                     </tr>
                     {% for label, values in data.items() %}
-                    <tr>
+                    <tr class="{% if loop.index % 2 == 0 %}even{% else %}odd{% endif %} {% if label == 'total' %}total{% endif %}">
+                        <td class="label">{{ label }}</td>
+
                         {% set nc = number_class(values.change) %}
+                        {% set plus = (values.change > 0) %}
+                        
                         {% if data_type == 'INTEGER' %}
-                            <td class="value {{ nc }}">{{ format_comma(values.change) }}</td>
+                            <td class="value {{ nc }}">{% if plus %}+{% endif %}{{ format_comma(values.change) }}</td>
                         {% elif data_type == 'TIME' %}
-                            <td class="value {{ nc }}">{{ format_duration(values.change) }}</td>
+                            <td class="value {{ nc }}">{% if plus %}+{% endif %}{{ format_duration(values.change) }}</td>
                         {% else %}
-                            <td class="value {{ nc }}">{{ '{:.1f}'.format(values.change) }}</td>
+                            <td class="value {{ nc }}">{% if plus %}+{% endif %}{{ '{:.1f}'.format(values.change) }}</td>
                         {% endif %}
                         <td class="percent {{ number_class(values.percent_change) }}">
                             {% if values.percent_change == None %}
                             -
                             {% else %}
-                            {{ '{:.1%}'.format(values.percent_change) }}
+                            {% if plus %}+{% endif %}{{ '{:.1%}'.format(values.percent_change) }}
                             {% endif %}
                         </td>
                         <td class="points {{ number_class(values.point_change) }}">
                             {% if values.point_change == None %}
                             -
                             {% else %}
-                            {{ '{:.1f}'.format(values.point_change * 100) }}
+                            {% if plus %}+{% endif %}{{ '{:.1f}'.format(values.point_change * 100) }}
                             {% endif %}
                         </td>
-                        <td class="label">{{ label }}</td>
                     </tr>
                     {% endfor %}
                 </table>

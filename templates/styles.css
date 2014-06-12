@@ -1,3 +1,36 @@
+body { 
+    font: 16px/1.5em Helvetica, Arial, sans-serif; 
+    color: #111; 
+    -webkit-font-smoothing: antialiased;
+}
+
+h1 { 
+    font: normal 32px/1.125 Georgia, serif; 
+    margin: 0 0 22px 0;
+}
+
+h2 { 
+    font-weight: normal; 
+    line-height: 1.2; 
+    margin-bottom: 22px; 
+    font-size: 22px;
+}
+
+h3 { 
+    font-weight: normal; 
+    line-height: 1.2; 
+    margin-bottom: 22px;
+}
+
+h4 {
+    font-weight: normal;
+    line-height: 1.2;
+    margin-bottom: 22px;
+}
+
+p { margin-bottom: 1.3em; }
+
+
 dt { font-weight: bold; }
 
 .query { margin-left: 40px; }
@@ -5,12 +38,14 @@ dt { font-weight: bold; }
 table { margin-left: 40px; }
 
 th,td { padding-left: 10px; padding-right: 10px; }
+tr.odd { background-color: #eee; }
+tr.total { background-color: #ddf; }
 .value { text-align: right }
 .percent { text-align: right }
 .points { text-align: right }
 .label { text-align: left; }
 
 /* Diff only */
-.positive { color: green; }
-.negative { color: red; }
+.positive { color: #151; }
+.negative { color: #511; }
 

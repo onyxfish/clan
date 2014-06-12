@@ -1,11 +1,13 @@
 clan diff
 
-Report A run {{ diff.a.run_date }}:
-{% for arg in GLOBAL_ARGUMENTS %}    {{ arg }}: {{ diff.a[arg] }}
+{% for report in ['a', 'b'] %}
+Report {{ report|upper }} run {{ diff[report].run_date }}:
+{% for arg in GLOBAL_ARGUMENTS %}
+{% if diff[report][arg] != None %}
+    {{ arg }}: {{ diff[report][arg] }}
+{% endif %}
 {% endfor %}
 
-Report B run {{ diff.b.run_date }}:
-{% for arg in GLOBAL_ARGUMENTS %}    {{ arg }}: {{ diff.b[arg] }}
 {% endfor %}
 
 Results
