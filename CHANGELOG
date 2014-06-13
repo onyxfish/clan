@@ -1,7 +1,8 @@
 0.1.3
 -----
 
-
+* Fix lots of template bugs. (#17, #18)
+* Add HTML output for reports and diffs. (#9)
 
 0.1.2
 -----
