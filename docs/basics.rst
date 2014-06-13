@@ -4,7 +4,7 @@ Basic usage
 
 clan has three basic uses
 
-* Writing query results to a text report suitable for reading or emailing.
+* Writing query results to a text or HTML report suitable for reading or emailing.
 * Writing query results to a JSON file suitable for further processing.
 * Generating a "diff", or change report, comparing two sets of query results, as either text or JSON.
 
@@ -42,7 +42,7 @@ To configure clan, create a YAML data file describing the analytics you want to 
 
 To run this report to a JSON file, run the following command. Note that by default clan will look for a YAML file called :code:`clan.yml`. You can override this with the :code:`-c` option. For complete documenation of this configuration, see :doc:`Configuration <configuration>`.
 
-To instead produce a text report, run:
+To produce a text report, run:
 
 .. code-block:: bash
 
@@ -98,6 +98,12 @@ Here is sample output for the above configuration::
               7,644     28.5%    mobile
               3,159     11.8%    tablet
              26,817    100.0%    total
+
+To produce HTML, run:
+
+.. code-block:: bash
+
+    clan report -f html analytics.html
 
 Generating a JSON report
 ------------------------
