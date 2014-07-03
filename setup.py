@@ -39,7 +39,7 @@ setup(
         'Topic :: Utilities'
     ],
     packages=[
-        'commands'
+        'clan'
     ],
     entry_points ={
         'console_scripts': [
