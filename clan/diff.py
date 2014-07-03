@@ -5,7 +5,7 @@ import json
 
 from jinja2 import Environment, PackageLoader
 
-from commands.utils import GLOBAL_ARGUMENTS, format_comma, format_duration, format_percent
+from clan.utils import GLOBAL_ARGUMENTS, format_comma, format_duration, format_percent
 
 class DiffCommand(object):
     def __init__(self):
