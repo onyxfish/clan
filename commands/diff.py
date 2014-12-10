@@ -182,7 +182,7 @@ class DiffCommand(object):
             'format_row': format_row
         }
 
-        f.write(template.render(**context))
+        f.write(template.render(**context).encode('utf-8'))
 
     def html(self, diff, f):
         """
@@ -212,5 +212,5 @@ class DiffCommand(object):
 
         }
 
-        f.write(template.render(**context))
+        f.write(template.render(**context).encode('utf-8'))
 

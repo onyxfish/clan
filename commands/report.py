@@ -319,7 +319,7 @@ class ReportCommand(object):
             'format_row': format_row
         }
 
-        f.write(template.render(**context))
+        f.write(template.render(**context).encode('utf-8'))
 
     def html(self, report, f):
         """
@@ -337,6 +337,6 @@ class ReportCommand(object):
             'format_percent': format_percent
         }
 
-        f.write(template.render(**context))
+        f.write(template.render(**context).encode('utf-8'))
 
 
