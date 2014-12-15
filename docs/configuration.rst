@@ -109,3 +109,7 @@ filter
 
 A Google Analytics `query filter expression <https://developers.google.com/analytics/devguides/reporting/core/v3/reference#filters>`_ to apply to the data. This will be "ANDed" togther with any filters automatically generated from other configuration options such as :code:`domain` or :code:`prefix`.
 
+segment
+-------
+
+A Google Analytics `segment definition <https://developers.google.com/analytics/devguides/reporting/core/v3/segments>`_ to use to filter the data.
