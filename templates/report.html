@@ -10,19 +10,36 @@
         <div class="container-fluid">
             <h1>{{ report.title }}</h1>
 
-            <h2>Sample Period: {{ report['start-date'] }} + {{ report['ndays'] }} days</h2>
+            <table class="table table-condensed">
+                <thead>
+                    <tr>
+                        <th>Variable</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for arg in GLOBAL_ARGUMENTS %} 
+                    {% if report[arg] != None %}
+                    <tr>
+                        <td>{{ arg }}</td>
+                        <td>{{ report[arg] }}</td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
 
             {% for query in report['queries'] %}
             <div class="query">
                 <h3>
                     {{ query.config.name }}
                     {% if query.sampled %}
-                    <span class="sample-size">Sample size: {{ query.sampleSize / query.sampleSpace * 100 }}%</span>
+                    <span class="sample-size">Sample size: {{ (query.sampleSize / query.sampleSpace * 100)|round(1) }}%</span>
                     {% endif %}
                 </h3>
 
                 {% if query.config.description %}
-                <p>{{ query.config.description }}</p>
+                <p class="description">{{ query.config.description }}</p>
                 {% endif %}
 
                 {% for metric, data in query.data.items() %}
@@ -70,7 +87,7 @@
             </div>
             {% endfor %}
             <footer>
-                <p>Report generated with <a href="http://github.com/onyxfish/clan">clan v. 0.1.4</a> on {{ report.run_date }} for property id {{ report['property-id'] }}</p>
+                <p>Report generated with <a href="http://github.com/onyxfish/clan">clan v. 0.1.4</a> on {{ report.run_date }}</p>
             </footer>
         </div>
     </body>
