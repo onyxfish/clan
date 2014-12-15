@@ -1,52 +1,62 @@
-body { 
-    font: 16px/1.5em Helvetica, Arial, sans-serif; 
-    color: #111; 
+body {
+    font: 16px/1.5em Helvetica, Arial, sans-serif;
+    color: #111;
     -webkit-font-smoothing: antialiased;
 }
 
-h1 { 
-    font: normal 32px/1.125 Georgia, serif; 
-    margin: 0 0 22px 0;
+.container-fluid {
+    max-width: 1024px;
 }
 
-h2 { 
-    font-weight: normal; 
-    line-height: 1.2; 
-    margin-bottom: 22px; 
-    font-size: 22px;
+h1,h2,h3,h4,h5,h6 {
+    font-weight: bold;
 }
 
-h3 { 
-    font-weight: normal; 
-    line-height: 1.2; 
-    margin-bottom: 22px;
-}
-
-h4 {
+h2 {
     font-weight: normal;
-    line-height: 1.2;
-    margin-bottom: 22px;
+    font-size: 24px;
+    margin-top: 0;
 }
 
-p { margin-bottom: 1.3em; }
+h3 {
+    margin-bottom: 20px;
+}
 
+.value, .percent {
+    text-align: right;
+}
 
-dt { font-weight: bold; }
+th, td {
+    width: 33.3333%;
+}
 
-.query { margin-left: 40px; }
-.metric { margin-left: 40px; }
-table { margin-left: 40px; }
+th {
+    font-weight: normal;
+    color: #666;
+}
 
-th,td { padding-left: 10px; padding-right: 10px; }
-tr.odd { background-color: #eee; }
-tr.total { background-color: #ddf; }
-.value { text-align: right }
-.percent { text-align: right }
-.points { text-align: right }
-.label { text-align: left; }
+tr.total {
+    background-color: rgba(91, 192, 222, 0.25) !important;
+}
+
+.sample-size {
+    color: #666;
+    font-size: 13px;
+    font-weight: normal;
+    margin-left: 10px;
+}
+
+.query {
+    margin-bottom: 50px;
+}
+
+footer p {
+    font-size: 13px;
+    color: #666;
+}
+
 
 /* Diff only */
 .positive { color: #151; }
 .positive::before { content: "+"; }
 .negative { color: #511; }
-
