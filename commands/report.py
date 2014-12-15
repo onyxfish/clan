@@ -93,6 +93,13 @@ class ReportCommand(object):
             help='Output format.'
         )
 
+
+        parser.add_argument(
+            '--title',
+            dest='title', action='store',
+            help='User-readable title of your report.'
+        )
+
         parser.add_argument(
             '--property-id',
             dest='property-id', action='store',
@@ -149,7 +156,7 @@ class ReportCommand(object):
 
         return d.strftime('%Y-%m-%d')
 
-    def query(self, start_date=None, end_date=None, ndays=None, metrics=[], dimensions=[], filters=None, sort=[], start_index=1, max_results=10):
+    def query(self, start_date=None, end_date=None, ndays=None, metrics=[], dimensions=[], filters=None, segment=None, sort=[], start_index=1, max_results=10):
         """
         Execute a query.
         """
@@ -214,6 +221,7 @@ class ReportCommand(object):
             metrics=','.join(metrics) or None,
             dimensions=','.join(dimensions) or None,
             filters=filters,
+            segment=segment,
             sort=','.join(sort) or None,
             start_index=str(start_index),
             max_results=str(max_results)
@@ -228,6 +236,7 @@ class ReportCommand(object):
         for arg in GLOBAL_ARGUMENTS:
             output[arg] = getattr(self.args, arg) or self.config.get(arg, None)
 
+        output['title'] = getattr(self.args, 'title') or self.config.get('title', None)
         output['run_date'] = datetime.now().strftime('%Y-%m-%d')
         output['queries'] = []
 
@@ -238,6 +247,7 @@ class ReportCommand(object):
                 metrics=analytic['metrics'],
                 dimensions=analytic.get('dimensions', []),
                 filters=analytic.get('filter', None),
+                segment=analytic.get('segment', None),
                 sort=analytic.get('sort', []),
                 start_index=analytic.get('start-index', 1),
                 max_results=analytic.get('max-results', 10)
