@@ -42,25 +42,32 @@ class ReportCommand(object):
         http = credentials.authorize(http=httplib2.Http())
         self.service = discovery.build('analytics', 'v3', http=http)
 
-        if self.args.data_path:
-            with open(self.args.data_path) as f:
+        input_format = os.path.splitext(self.args.input_path)[1]
+
+        if input_format == '.json':
+            with open(self.args.input_path) as f:
                 report = json.load(f, object_pairs_hook=OrderedDict)
-        else:
-            with open(self.args.config_path) as f:
+        elif input_format == '.yml' or input_format == '.yaml':
+            with open(self.args.input_path) as f:
                 self.config = yaml.load(f)
 
             if 'property-id' not in self.config:
                 raise Exception('You must specify a property-id either in your YAML file or using the --property-id argument.')
 
             report = self.report()
+        else:
+            raise Exception('Unsupported input format: %s. Must be .yml or .json.' % input_format)
 
-        with open(self.args.output, 'w') as f:
-            if self.args.format == 'txt':
-                self.txt(report, f)
-            elif self.args.format == 'html':
+        output_format = os.path.splitext(self.args.output_path)[1]
+
+        if output_format == '.html':
+            with open(self.args.output_path, 'w') as f:
                 self.html(report, f)
-            elif self.args.format == 'json':
+        elif output_format == '.json':
+            with open(self.args.output_path, 'w') as f:
                 json.dump(report, f, indent=4)
+        else:
+            raise Exception('Unsupported output format: %s. Must be .html or .json.' % output_format) 
 
     def add_argparser(self, root, parents):
         """
@@ -76,28 +83,15 @@ class ReportCommand(object):
         )
 
         parser.add_argument(
-            '-c', '--config',
-            dest='config_path', action='store', default='clan.yml',
-            help='Path to a YAML configuration file (clan.yml).'
-        )
-
-        parser.add_argument(
-            '-d', '--data',
-            dest='data_path', action='store', default=None,
-            help='Path to a existing JSON report file.'
-        )
-
-        parser.add_argument(
             '-f', '--format',
-            dest='format', action='store', default='txt', choices=['txt', 'json', 'html'],
-            help='Output format.'
+            dest='format', action='store', default='html', choices=['html', 'json'],
+            help='Output format. (Defaults to HTML.)'
         )
-
 
         parser.add_argument(
             '--title',
             dest='title', action='store',
-            help='User-readable title of your report.'
+            help='User-friendly title for your report.'
         )
 
         parser.add_argument(
@@ -137,9 +131,15 @@ class ReportCommand(object):
         )
 
         parser.add_argument(
-            'output',
+            'input_path',
             action='store',
-            help='Output file path.'
+            help='Path to either a YAML configuration file or pre-reported JSON data.'
+        )
+
+        parser.add_argument(
+            'output_path',
+            action='store',
+            help='Path to output either an HTML report or a JSON data file.'
         )
 
         return parser
@@ -295,41 +295,6 @@ class ReportCommand(object):
             output['queries'].append(data)
 
         return output
-
-    def txt(self, report, f):
-        """
-        Write report data to a human-readable text file.
-        """
-        env = Environment(
-            loader=PackageLoader('clan', 'templates'),
-            trim_blocks=True,
-            lstrip_blocks=True
-        )
-        template = env.get_template('report.txt')
-
-        def format_row(label, value, total, data_type):
-            if data_type == 'INTEGER':
-                pct = format_percent(value, total) if total > 0 else '-' 
-                value = format_comma(value)
-            elif data_type == 'TIME':
-                pct = '-'
-                value = format_duration(value)
-            elif data_type in ['FLOAT', 'CURRENCY', 'PERCENT']:
-                pct = '-'
-                value = '%.1f' % value
-
-            return '{:>15s}    {:>8s}    {:s}\n'.format(value, pct, label)
-
-        context = {
-            'report': report,
-            'GLOBAL_ARGUMENTS': GLOBAL_ARGUMENTS,
-            'format_comma': format_comma,
-            'format_duration': format_duration,
-            'format_percent': format_percent,
-            'format_row': format_row
-        }
-
-        f.write(template.render(**context).encode('utf-8'))
 
     def html(self, report, f):
         """

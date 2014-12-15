@@ -7,7 +7,7 @@ Configuring with YAML
 
 clan is configured using either YAML, command-line arguments or both.
 
-By default clan will look for a YAML file called :code:`clan.yml`. This can be configured using the :code:`-c` command line flag. The basic structure of this file is:
+The basic structure of the YAML configuration file is:
 
 .. code-block:: yaml
 
@@ -35,6 +35,11 @@ The following is a list of properties that may be specified in as global configu
 1. Command-line values
 2. Query configuration in YAML
 #. Global configuration in YAML
+
+title
+-----
+
+A user-friendly title for the report.
 
 property-id
 -----------
@@ -74,7 +79,12 @@ Individual queries support the following properties.
 name
 ----
 
-A description of the query. Will be used as a display name when rendering a text report.
+A brief name for the query..
+
+description
+-----------
+
+A longer description of the query.
 
 metrics
 -------

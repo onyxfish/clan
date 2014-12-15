@@ -2,6 +2,7 @@
 
 from collections import OrderedDict
 import json
+import os
 
 from jinja2 import Environment, PackageLoader
 
@@ -17,25 +18,24 @@ class DiffCommand(object):
         """
         self.args = args
 
-        if self.args.data_path:
-            with open(self.args.data_path) as f:
-                diff = json.load(f, object_pairs_hook=OrderedDict)
-        else:
-            with open(self.args.report_a) as f:
-                report_a = json.load(f, object_pairs_hook=OrderedDict)
+        with open(self.args.report_a_path) as f:
+            report_a = json.load(f, object_pairs_hook=OrderedDict)
 
-            with open(self.args.report_b) as f:
-                report_b = json.load(f, object_pairs_hook=OrderedDict)
+        with open(self.args.report_b_path) as f:
+            report_b = json.load(f, object_pairs_hook=OrderedDict)
 
-            diff = self.diff(report_a, report_b)
+        diff = self.diff(report_a, report_b)
 
-        with open(self.args.output, 'w') as f:
-            if self.args.format == 'txt':
-                self.txt(diff, f)
-            elif self.args.format == 'html':
+        output_format = os.path.splitext(self.args.output_path)[1]
+
+        if output_format == '.html':
+            with open(self.args.output_path, 'w') as f:
                 self.html(diff, f)
-            elif self.args.format == 'json':
+        elif output_format == '.json':
+            with open(self.args.output_path, 'w') as f:
                 json.dump(diff, f, indent=4)
+        else:
+            raise Exception('Unsupported output format: %s. Must be .html or .json.' % output_format) 
 
     def add_argparser(self, root, parents):
         """
@@ -63,21 +63,21 @@ class DiffCommand(object):
         )
 
         parser.add_argument(
-           'report_a',
+           'report_a_path',
             action='store',
-            help='First JSON report file path.'
+            help='Path to a JSON file containing the initial report data.'
         )
 
         parser.add_argument(
-           'report_b',
+           'report_b_path',
             action='store',
-            help='Second JSON report file path.'
+            help='Path to a JSON file containing the report data to compare.'
         )
 
         parser.add_argument(
-            'output',
+            'output_path',
             action='store',
-            help='Output file path.'
+            help='Path to output either an HTML report or a JSON data file.'
         )
 
         return parser

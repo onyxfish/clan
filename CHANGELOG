@@ -1,7 +1,12 @@
-0.1.4
+0.2.0
 -----
 
-
+* Simplify command-line usage.
+* Kill text support.
+* Redesigned HTML output.
+* Added user-configurable query description property.
+* Added user-configurable report title property.
+* Added support for query segment" property.
 
 0.1.3
 -----
