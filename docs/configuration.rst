@@ -12,6 +12,7 @@ By default clan will look for a YAML file called :code:`clan.yml`. This can be c
 .. code-block:: yaml
 
     # Global configuration
+    title: Sample configuration
     property-id: "53470309"
 
     # A list of queries to execute
@@ -19,6 +20,7 @@ By default clan will look for a YAML file called :code:`clan.yml`. This can be c
 
         # Individual query configuration
         - name: Totals
+          description: Property-wide top-level totals. 
           metrics:
               - "ga:pageviews"
               - "ga:uniquePageviews"

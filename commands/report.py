@@ -93,6 +93,13 @@ class ReportCommand(object):
             help='Output format.'
         )
 
+
+        parser.add_argument(
+            '--title',
+            dest='title', action='store',
+            help='User-readable title of your report.'
+        )
+
         parser.add_argument(
             '--property-id',
             dest='property-id', action='store',
@@ -229,6 +236,7 @@ class ReportCommand(object):
         for arg in GLOBAL_ARGUMENTS:
             output[arg] = getattr(self.args, arg) or self.config.get(arg, None)
 
+        output['title'] = getattr(self.args, 'title') or self.config.get('title', None)
         output['run_date'] = datetime.now().strftime('%Y-%m-%d')
         output['queries'] = []
 

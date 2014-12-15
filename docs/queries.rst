@@ -85,8 +85,8 @@ Top social sources
       sort:
           - "-ga:pageviews"
 
-Page load
----------
+Page load and render times
+--------------------------
 
 .. code-block:: yaml
 
