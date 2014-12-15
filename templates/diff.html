@@ -2,83 +2,89 @@
     <head>
         <meta charset="UTF-8">
         <style>
+            {% include 'bootstrap.min.css' %}
             {% include 'styles.css' %}
         </style>
     </head>
-    <body>
+    <body class="diff">
+        <div class="container-fluid">
+            <h1>clan diff</h1>
 
-    </body>
-        <h1>clan diff</h1>
-
-        {% for report in ['a', 'b'] %}
-        <h2>Report {{ report|upper }} run {{ diff[report].run_date }}</h2>
-
-        <table>
-            <tbody>
-                {% for arg in GLOBAL_ARGUMENTS %} 
-                {% if diff[report][arg] != None %}
-                <tr>
-                    <td>{{ arg }}</td>
-                    <td>{{ diff[report][arg] }}</td>
-                </tr>
-                {% endif %}
-                {% endfor %}
-            </tbody>
-        </table>
-        {% endfor %}
-
-        <h2>Results</h2>
-
-        {% for query in diff.queries %}
-        <div class="query">
-            <h3>{{ query.config.name }}</h3>
-
-            {% for metric, data in query.data.items() %}
-            <div class="metric">
-                <h4>{{ metric }}</h4>
-            
-                {% set data_type = query.data_types[metric] %}
-
-                <table>
+            <table class="table table-condensed">
+                <thead>
                     <tr>
-                        <th class="label">Label</th>
-                        <th class="value">Value change</th>
-                        <th class="percent">Percent change</th>
-                        <th class="points">Percentage point change</th>
+                        <th></th>
+                        {% for report in ['a', 'b'] %}
+                        <th>Report {{ report|upper }}</th>
+                        {% endfor %}
+                <tbody>
+                    {% for arg in GLOBAL_ARGUMENTS %}
+                    {% if diff['a'][arg] != None or diff['b'][arg] != None %}
+                    <tr>
+                        <td>{{ arg }}</td>
+                        <td>{{ diff['a'][arg] }}</td>
+                        <td>{{ diff['b'][arg] }}</td>
                     </tr>
-                    {% for label, values in data.items() %}
-                    <tr class="{% if loop.index % 2 == 0 %}even{% else %}odd{% endif %} {% if label == 'total' %}total{% endif %}">
-                        <td class="label">{{ label }}</td>
-
-                        {% set nc = number_class(values.change) %}
-                        
-                        {% if data_type == 'INTEGER' %}
-                            <td class="value {{ nc }}"> {{ format_comma(values.change) }}</td>
-                        {% elif data_type == 'TIME' %}
-                            <td class="value {{ nc }}"> {{ format_duration(values.change) }}</td>
-                        {% else %}
-                            <td class="value {{ nc }}"> {{ '{:.1f}'.format(values.change) }}</td>
-                        {% endif %}
-                        <td class="percent {{ number_class(values.percent_change) }}">
-                            {% if values.percent_change == None %}
-                            -
-                            {% else %}
-                            {{ '{:.1%}'.format(values.percent_change) }}
-                            {% endif %}
-                        </td>
-                        <td class="points {{ number_class(values.point_change) }}">
-                            {% if values.point_change == None %}
-                            -
-                            {% else %}
-                            {{ '{:.1f}'.format(values.point_change * 100) }}
-                            {% endif %}
-                        </td>
-                    </tr>
+                    {% endif %}
                     {% endfor %}
-                </table>
+                </tbody>
+            </table>
+            
+            {% for query in diff.queries %}
+            <div class="query">
+                <h3>{{ query.config.name }}</h3>
+
+                {% for metric, data in query.data.items() %}
+                <div class="metric">
+                    <h4>{{ metric }}</h4>
+
+                    {% set data_type = query.data_types[metric] %}
+
+                    <table class="table table-bordered table-condensed table-striped">
+                        <thead>
+                            <tr>
+                                <th>Label</th>
+                                <th class="value">Value change</th>
+                                <th class="percent">Percent change</th>
+                                <th class="points">Percentage point change</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for label, values in data.items() %}
+                        <tr class="{% if loop.index % 2 == 0 %}even{% else %}odd{% endif %} {% if label == 'total' %}total{% endif %}">
+                            <td>{{ label }}</td>
+
+                            {% set nc = number_class(values.change) %}
+
+                            {% if data_type == 'INTEGER' %}
+                                <td class="value {{ nc }}"> {{ format_comma(values.change) }}</td>
+                            {% elif data_type == 'TIME' %}
+                                <td class="value {{ nc }}"> {{ format_duration(values.change) }}</td>
+                            {% else %}
+                                <td class="value {{ nc }}"> {{ '{:.1f}'.format(values.change) }}</td>
+                            {% endif %}
+                            <td class="percent {{ number_class(values.percent_change) }}">
+                                {% if values.percent_change == None %}
+                                -
+                                {% else %}
+                                {{ '{:.1%}'.format(values.percent_change) }}
+                                {% endif %}
+                            </td>
+                            <td class="points {{ number_class(values.point_change) }}">
+                                {% if values.point_change == None %}
+                                -
+                                {% else %}
+                                {{ '{:.1f}'.format(values.point_change * 100) }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endfor %}
             </div>
             {% endfor %}
         </div>
-        {% endfor %}
     </body>
 </html>
