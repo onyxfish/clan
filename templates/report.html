@@ -8,7 +8,7 @@
     </head>
     <body>
         <div class="container-fluid">
-            <h1>Title TKTKTK</h1>
+            <h1>{{ report.title }}</h1>
 
             <h2>Sample Period: {{ report['start-date'] }} + {{ report['ndays'] }} days</h2>
 
@@ -20,6 +20,10 @@
                     <span class="sample-size">Sample size: {{ query.sampleSize / query.sampleSpace * 100 }}%</span>
                     {% endif %}
                 </h3>
+
+                {% if query.config.description %}
+                <p>{{ query.config.description }}</p>
+                {% endif %}
 
                 {% for metric, data in query.data.items() %}
                 <div class="metric">
