@@ -15,7 +15,7 @@
                     <tr>
                         <th>Configuration</th>
                         {% for report in ['a', 'b'] %}
-                        <th>{{ report.title }}</th>
+                        <th>{{ diff[report].title or 'Untitled Report' }}</th>
                         {% endfor %}
                 <tbody>
                     {% for arg in GLOBAL_ARGUMENTS %}
@@ -36,7 +36,14 @@
 
                 {% for metric, data in query.data.items() %}
                 <div class="metric">
+                    {% if metric in field_definitions %}
+                    <h4>
+                        {{ field_definitions[metric]['uiName'] }}
+                        <span class="ga-name">{{ metric }}</span>
+                    </h4>
+                    {% else %}
                     <h4>{{ metric }}</h4>
+                    {% endif %}
 
                     {% set data_type = query.data_types[metric] %}
 

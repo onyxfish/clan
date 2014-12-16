@@ -6,7 +6,7 @@ import os
 
 from jinja2 import Environment, PackageLoader
 
-from commands.utils import GLOBAL_ARGUMENTS, format_comma, format_duration, format_percent
+from commands.utils import GLOBAL_ARGUMENTS, format_comma, format_duration, format_percent, load_field_definitions
 
 class DiffCommand(object):
     def __init__(self):
@@ -17,6 +17,7 @@ class DiffCommand(object):
         Compare two data files and generate a report of their differences.
         """
         self.args = args
+        self.field_definitions = load_field_definitions()
 
         with open(self.args.report_a_path) as f:
             report_a = json.load(f, object_pairs_hook=OrderedDict)
@@ -169,6 +170,7 @@ class DiffCommand(object):
 
         context = {
             'diff': diff,
+            'field_definitions': self.field_definitions,
             'GLOBAL_ARGUMENTS': GLOBAL_ARGUMENTS,
             'format_comma': format_comma,
             'format_duration': format_duration,

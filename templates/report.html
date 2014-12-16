@@ -31,12 +31,7 @@
 
             {% for query in report['queries'] %}
             <div class="query">
-                <h3>
-                    {{ query.config.name }}
-                    {% if query.sampled %}
-                    <span class="sample-size">Sample size: {{ (query.sampleSize / query.sampleSpace * 100)|round(1) }}%</span>
-                    {% endif %}
-                </h3>
+                <h3>{{ query.config.name }}</h3>
 
                 {% if query.config.description %}
                 <p class="description">{{ query.config.description }}</p>
@@ -44,7 +39,14 @@
 
                 {% for metric, data in query.data.items() %}
                 <div class="metric">
+                    {% if metric in field_definitions %}
+                    <h4>
+                        {{ field_definitions[metric]['uiName'] }}
+                        <span class="ga-name">{{ metric }}</span>
+                    </h4>
+                    {% else %}
                     <h4>{{ metric }}</h4>
+                    {% endif %}
 
                     <table class="table table-striped table-bordered table-consdensed">
                         <thead>
@@ -84,7 +86,12 @@
                     </table>
                 </div>
                 {% endfor %}
+
+                {% if query.sampled %}
+                    <span class="sample-size">Based on a sample of {{ (query.sampleSize / query.sampleSpace * 100)|round(1) }}% of sessions.</span>
+                {% endif %}
             </div>
+
             {% endfor %}
             <footer>
                 <p>Report generated with <a href="http://github.com/onyxfish/clan">clan v. 0.1.4</a> on {{ report.run_date }}</p>

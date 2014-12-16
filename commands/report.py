@@ -12,7 +12,7 @@ import httplib2
 from jinja2 import Environment, PackageLoader
 from oauth2client.file import Storage
 
-from commands.utils import GLOBAL_ARGUMENTS, format_comma, format_duration, format_percent
+from commands.utils import GLOBAL_ARGUMENTS, format_comma, format_duration, format_percent, load_field_definitions
 
 class ReportCommand(object):
     def __init__(self):
@@ -22,6 +22,7 @@ class ReportCommand(object):
 
     def __call__(self, args):
         self.args = args
+        self.field_definitions = load_field_definitions()
 
         if not self.args.auth:
             home_path = os.path.expanduser('~/.clan_auth.dat')
@@ -301,6 +302,7 @@ class ReportCommand(object):
         context = {
             'report': report,
             'GLOBAL_ARGUMENTS': GLOBAL_ARGUMENTS,
+            'field_definitions': self.field_definitions,
             'format_comma': format_comma,
             'format_duration': format_duration,
             'format_percent': format_percent

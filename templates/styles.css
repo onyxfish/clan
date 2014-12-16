@@ -47,11 +47,17 @@ th {
     background-color: rgba(91, 192, 222, 0.15);
 }
 
-.sample-size {
+.ga-name {
     color: #666;
     font-size: 13px;
     font-weight: normal;
     margin-left: 10px;
+}
+
+.sample-size {
+    color: #666;
+    font-size: 13px;
+    font-weight: normal;
 }
 
 .query {

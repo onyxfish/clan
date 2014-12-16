@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+import json
+import os
+
+import requests
+
 GLOBAL_ARGUMENTS = [
     'property-id',
     'start-date',
@@ -8,6 +13,36 @@ GLOBAL_ARGUMENTS = [
     'domain',
     'prefix',
 ] 
+
+FIELD_DEFINITIONS_URL = 'https://www.googleapis.com/analytics/v3/metadata/ga/columns'
+FIELD_DEFINITIONS_PATH = os.path.expanduser('~/.clan_defs.json')
+
+def load_field_definitions():
+    if os.path.exists(FIELD_DEFINITIONS_PATH):
+        with open(FIELD_DEFINITIONS_PATH) as f:
+            fields = json.load(f)
+    else:
+        response = requests.get(FIELD_DEFINITIONS_URL)
+
+        if not response.status_code == 200:
+            raise Exception('Failed to fetch field definitions from Google!')
+
+        data = response.json()
+
+        fields = {}
+
+        for item in data['items']:
+            fields[item['id']] = {
+                'type': item['attributes']['type'],
+                'dataType': item['attributes']['dataType'],
+                'uiName': item['attributes']['uiName'],
+                'description': item['attributes']['description']
+            }
+
+        with open(FIELD_DEFINITIONS_PATH, 'w') as f:
+            json.dump(fields, f)
+
+    return fields
 
 def format_comma(d):
     """
