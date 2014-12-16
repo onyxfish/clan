@@ -83,12 +83,6 @@ class ReportCommand(object):
         )
 
         parser.add_argument(
-            '-f', '--format',
-            dest='format', action='store', default='html', choices=['html', 'json'],
-            help='Output format. (Defaults to HTML.)'
-        )
-
-        parser.add_argument(
             '--title',
             dest='title', action='store',
             help='User-friendly title for your report.'
@@ -236,7 +230,7 @@ class ReportCommand(object):
         for arg in GLOBAL_ARGUMENTS:
             output[arg] = getattr(self.args, arg) or self.config.get(arg, None)
 
-        output['title'] = getattr(self.args, 'title') or self.config.get('title', None)
+        output['title'] = getattr(self.args, 'title') or self.config.get('title', 'Untitled Report')
         output['run_date'] = datetime.now().strftime('%Y-%m-%d')
         output['queries'] = []
 

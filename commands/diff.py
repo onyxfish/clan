@@ -57,12 +57,6 @@ class DiffCommand(object):
         )
 
         parser.add_argument(
-            '-f', '--format',
-            dest='format', action='store', default='txt', choices=['txt', 'json', 'html'],
-            help='Output format.'
-        )
-
-        parser.add_argument(
            'report_a_path',
             action='store',
             help='Path to a JSON file containing the initial report data.'
