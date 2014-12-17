@@ -1,6 +1,7 @@
 0.2.0
 -----
 
+* Rev google-api-python-client to latest version.
 * Documented a release process.
 * Added Tyler Fisher to AUTHORS.
 * Added Danny DeBelius to AUTHORS.
