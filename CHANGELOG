@@ -1,6 +1,7 @@
 0.2.0
 -----
 
+* Retructure code so pip works. (#26)
 * Fetch human-readable field names from Google.
 * Simplify command-line usage.
 * Kill text support.

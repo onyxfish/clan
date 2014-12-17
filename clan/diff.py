@@ -6,7 +6,7 @@ import os
 
 from jinja2 import Environment, PackageLoader
 
-from commands.utils import GLOBAL_ARGUMENTS, format_comma, format_duration, format_percent, load_field_definitions
+from clan.utils import GLOBAL_ARGUMENTS, format_comma, format_duration, format_percent, load_field_definitions
 
 class DiffCommand(object):
     def __init__(self):
@@ -81,7 +81,6 @@ class DiffCommand(object):
         """
         Generate a diff for two data reports.
         """
-
         arguments = GLOBAL_ARGUMENTS + ['run_date']
 
         output = OrderedDict([

@@ -16,7 +16,7 @@ if sys.version_info < (2, 7):
 
 setup(
     name='clan',
-    version='0.1.4',
+    version='0.2.0',
     description='A command line utility for working with Google Analytics.',
     long_description=open('README').read(),
     author='Christopher Groskopf',
@@ -40,12 +40,16 @@ setup(
         'Topic :: Utilities'
     ],
     packages=[
-        'commands'
+        'clan'
     ],
-    entry_points ={
+    package_data={
+        'clan': ['templates/*']
+    },
+    entry_points={
         'console_scripts': [
             'clan = clan:_main'
         ]
     },
-    install_requires = install_requires
+    include_package_data=True,
+    install_requires=install_requires
 )

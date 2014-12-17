@@ -12,7 +12,7 @@ import httplib2
 from jinja2 import Environment, PackageLoader
 from oauth2client.file import Storage
 
-from commands.utils import GLOBAL_ARGUMENTS, format_comma, format_duration, format_percent, load_field_definitions
+from clan.utils import GLOBAL_ARGUMENTS, format_comma, format_duration, format_percent, load_field_definitions
 
 class ReportCommand(object):
     def __init__(self):

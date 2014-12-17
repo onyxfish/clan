@@ -3,12 +3,14 @@
 import argparse
 import sys 
 
-import commands
+from clan.auth import AuthCommand
+from clan.diff import DiffCommand
+from clan.report import ReportCommand
 
 COMMANDS = [
-    commands.AuthCommand,
-    commands.ReportCommand,
-    commands.DiffCommand
+    AuthCommand,
+    ReportCommand,
+    DiffCommand
 ]
 
 class Clan(object):

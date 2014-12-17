@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import argparse
 import os
 
 from oauth2client import client
@@ -22,7 +21,7 @@ class AuthCommand(object):
             elif os.path.exists(home_path):
                 self.args.secrets = home_path
             else:
-                raise Exception('Could not locate authentication secrets (client_secrets.jsonn). Please create it or specify a different file using --secrets.')
+                raise Exception('Could not locate authentication secrets (client_secrets.json). Please create it or specify a different file using --secrets.')
 
         storage = Storage('analytics.dat')
         
