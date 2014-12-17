@@ -1,0 +1,154 @@
+# Globals
+title: "Best Books 2014 (first 7 days)"
+property-id: "53470309"
+domain: "apps.npr.org"
+prefix: "/best-books-2014/"
+start-date: "2014-12-03"
+ndays: 7
+
+# Metrics
+queries:
+    - name: "Totals"
+      description: "Note: Sessions is the most important number for comparison."
+      metrics:
+          - "ga:pageviews"
+          - "ga:uniquePageviews"
+          - "ga:users"
+          - "ga:sessions"
+
+    - name: "Sessions by device category"
+      metrics:
+          - "ga:sessions"
+      dimensions:
+          - "ga:deviceCategory"
+      sort:
+          - "-ga:sessions"
+
+    - name: "Sessions by browser"
+      metrics:
+          - "ga:sessions"
+      dimensions:
+          - "ga:browser"
+      sort:
+          - "-ga:sessions"
+
+    - name: "Sessions by referring domain"
+      metrics:
+          - "ga:sessions"
+      dimensions:
+          - "ga:source"
+      sort:
+          - "-ga:sessions"
+
+    - name: "Sessions by referring social network"
+      metrics:
+          - "ga:sessions"
+      dimensions:
+          - "ga:socialNetwork"
+      sort:
+          - "-ga:sessions"
+
+    - name: "Performance"
+      metrics:
+          - "ga:avgPageLoadTime"
+          - "ga:avgPageDownloadTime"
+          - "ga:avgDomInteractiveTime"
+          - "ga:avgDomContentLoadedTime"
+
+    - name: "Time spent on page by device category"
+      description: "Note: Time on page is an unreliable metric and not reliable except for comparison to other projects."
+      metrics:
+          - "ga:avgTimeOnPage"
+      dimensions:
+          - "ga:deviceCategory"
+      sort:
+          - "-ga:avgTimeOnPage"
+
+    - name: "Share/Discuss panel opened"
+      metrics:
+          - "ga:totalEvents"
+      filter: "ga:eventAction==open-share-discuss"
+
+    - name: "Tweet link clicked"
+      metrics:
+          - "ga:totalEvents"
+      filter: "ga:eventAction==tweet"
+
+    - name: "Facebook share link clicked"
+      metrics:
+          - "ga:totalEvents"
+      filter: "ga:eventAction==facebook"
+
+    - name: "Pinterest share link clicked"
+      metrics:
+          - "ga:totalEvents"
+      filter: "ga:eventAction==pinterest"
+
+    - name: "Email link clicked"
+      metrics:
+          - "ga:totalEvents"
+      filter: "ga:eventAction==email"
+
+    - name: "Summary Copied"
+      metrics:
+          - "ga:totalEvents"
+      filter: "ga:eventAction==summary-copied"
+
+    - name: "Book viewed"
+      description: "Sorted by books viewed most often."
+      metrics:
+          - "ga:totalEvents"
+      dimensions:
+          - "ga:eventLabel"
+      filter: "ga:eventAction==view-review"
+      sort: 
+        - "-ga:totalEvents"
+      max-results: 20
+
+    - name: "Used previous/next review navigation"
+      metrics:
+          - "ga:totalEvents"
+      dimensions:
+          - "ga:eventLabel"
+      filter: "ga:eventAction==navigate"
+
+    - name: "Tags selected"
+      description: "Sorted by combinations of tags selected most often."
+      metrics:
+          - "ga:totalEvents"
+      dimensions:
+          - "ga:eventLabel"
+      filter: "ga:eventAction==selected-tags"
+      sort: 
+        - "-ga:totalEvents"
+      max-results: 50
+
+    - name: "Tags cleared"
+      metrics:
+          - "ga:totalEvents"
+      filter: "ga:eventAction==clear-tags"
+
+    - name: "Amazon link clicked"
+      description: "Link added to project on 2014-12-5."
+      metrics:
+          - "ga:totalEvents"
+      filter: "ga:eventAction==amazon"
+
+    - name: "iBooks link clicked"
+      description: "Link added to project on 2014-12-5."
+      metrics:
+          - "ga:totalEvents"
+      filter: "ga:eventAction==ibooks"
+
+    - name: "Indiebound link clicked"
+      description: "Link added to project on 2014-12-5."
+      metrics:
+          - "ga:totalEvents"
+      filter: "ga:eventAction==indiebound"
+
+    - name: "Library link clicked"
+      description: "Link added to project on 2014-12-5."
+      metrics:
+          - "ga:totalEvents"
+      filter: "ga:eventAction==library"
+

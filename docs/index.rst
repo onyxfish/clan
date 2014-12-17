@@ -7,6 +7,14 @@ About
 
 .. include:: ../README
 
+See clan in action
+==================
+
+From `NPR Visuals Book Concierge 2014 <http://apps.npr.org/best-books-2014/>`_ project:
+
+* `Clan report <_static/books14.html>`_
+* `Clan configuration <_static/books14.yml>`_ .
+
 Getting started
 ===============
 
