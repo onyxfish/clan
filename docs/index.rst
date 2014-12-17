@@ -26,6 +26,14 @@ Usage
     configuration
     queries
 
+Development
+===========
+
+.. toctree::
+    :maxdepth: 2
+
+    release
+
 Authors
 =======
 
