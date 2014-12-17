@@ -1,6 +1,9 @@
 0.2.0
 -----
 
+* Documented a release process.
+* Added Tyler Fisher to AUTHORS.
+* Added Danny DeBelius to AUTHORS.
 * Retructure code so pip works. (#26)
 * Fetch human-readable field names from Google.
 * Simplify command-line usage.
