@@ -4,4 +4,4 @@ argparse>=1.2.1
 pyyaml==3.11
 sphinx>=1.0.7
 Jinja2==2.7.3
-requests==2.5.0
+requests==2.20.0
