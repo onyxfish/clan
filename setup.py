@@ -6,7 +6,7 @@ from setuptools import setup
 install_requires = [
     'google-api-python-client==1.3.1',
     'httplib2==0.9',
-    'pyyaml==3.11',
+    'pyyaml==5.4',
     'Jinja2==2.7.3',
     'requests==2.5.0'
 ]
